@@ -1,7 +1,9 @@
 syntax = "proto3";
+
+
+package connect;
 import "user_metadata.proto";
 
-package chat;
 
 service ChatService {
   // Bidirectional streaming for real-time chat
@@ -14,12 +16,14 @@ message Message {
   string sender = 2;
   string content = 3;
   string recipient = 4;
+  MessageStatus status = 5;
+
 }
 
 message Chat {
   string chat_id = 1;
   string chat_type = 2; // 'individual' or 'group'
-  repeated user.User participants = 3;
+  repeated connect.User participants = 3;
   string created_at = 4;
   string updated_at = 5;
   Message last_message = 6;
@@ -30,7 +34,14 @@ message GroupMetaData {
   string name = 1;
   string description = 2;
   string creation_date = 3;
-  user.User created_by = 4;
-  repeated user.User admins = 5;
+  connect.User created_by = 4;
+  repeated connect.User admins = 5;
   string profile_picture = 6;
+}
+
+enum MessageStatus {
+  SENT = 0; // Message sent but not yet delivered
+  DELIVERED = 1; // Message delivered to recipient
+  READ = 2; // Message read by recipient
+  ERROR = 3; // Error in sending message
 }

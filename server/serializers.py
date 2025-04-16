@@ -1,6 +1,6 @@
 from bson import ObjectId
 from .models import UserMetaDataModel
-from ..protos.python import user_metadata_pb2 , chat_metadata_pb2
+from protos.python import user_metadata_pb2 
 
 def convert_objectid(data):
     if isinstance(data, ObjectId):

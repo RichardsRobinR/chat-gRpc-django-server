@@ -3,6 +3,7 @@ import mongoengine as me
 class UserMetaDataModel(me.Document):
     meta = {'collection': 'snap_usermeta'}
 
+
     uid = me.StringField(max_length=128, unique=True, required=True)
     uuid = me.StringField(max_length=6, unique=True, required=True)
     username = me.StringField(max_length=50, unique=True, required=True)
@@ -33,6 +34,7 @@ class ChatMetaDataModel(me.Document):
     meta = {'collection': 'snap_chatmeta'}
 
     # Core fields
+    id = me.ObjectIdField(primary_key=True)
     chat_id = me.StringField(max_length=128, unique=True, required=True)
     chat_type = me.StringField(max_length=20, required=True)  # e.g., 'individual', 'group'
     participants = me.ListField(me.ReferenceField('UserMetaDataModel'))  # Array of User references
@@ -41,7 +43,7 @@ class ChatMetaDataModel(me.Document):
     # last_message = me.ReferenceField('MessageModel')  # Reference to the most recent message
 
     # Group metadata (only for group chats)
-    group_metadata = me.EmbeddedDocumentField('GroupMetaData', null=True)
+    # group_metadata = me.EmbeddedDocumentField('GroupMetaData', null=True)
 
     def __str__(self):
         return self.chat_id
@@ -53,3 +55,19 @@ class GroupMetaData(me.EmbeddedDocument):
     created_by = me.ReferenceField('UserMetaDataModel')
     admins = me.ListField(me.ReferenceField('UserMetaDataModel'))
     profile_picture = me.StringField()  # URL or file reference
+
+
+class MessageModel(me.Document):
+    meta = {'collection': 'snap_messages'}
+
+    # message_id = me.StringField(max_length=128, unique=True, required=True)
+    # chat_id = me.ReferenceField('ChatMetaDataModel', required=True)  # Reference to the chat
+    sender = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the sender
+    recipient = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the recipient
+    content = me.StringField(required=True)
+    # timestamp = me.DateTimeField(required=True)
+    # message_type = me.StringField(max_length=20, required=True)  # e.g., 'text', 'image', 'video'
+    status = me.StringField(max_length=20, default='sent')  # e.g., 'sent', 'delivered', 'read'
+
+    def __str__(self):
+        return self.message_id

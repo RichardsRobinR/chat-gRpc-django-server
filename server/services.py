@@ -1,9 +1,15 @@
-from .models import UserMetaDataModel
-from ..protos.python import user_metadata_pb2 , chat_metadata_pb2 , user_metadata_pb2_grpc , chat_metadata_pb2_grpc
+from .models import UserMetaDataModel , MessageModel ,ChatMetaDataModel , GroupMetaData
+
 from .serializers import UserMetaDataGRPCSerializer
 import threading
 import queue
 import grpc
+from protos.python import user_metadata_pb2_grpc , user_metadata_pb2
+from protos.python import chat_metadata_pb2_grpc , chat_metadata_pb2
+from bson import ObjectId
+from mongoengine import ValidationError, NotUniqueError
+
+
 
 
 class UserService(user_metadata_pb2_grpc.UserServiceServicer):
@@ -49,6 +55,8 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             # Start message processing thread
             def process_messages():
                 try:
+
+                    print("first_message", first_message)
                     # Process first message
                     self._route_message(first_message, my_queue)
                     # Process remaining messages
@@ -81,17 +89,52 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             return  # Don't forward join messages
         with self.lock:
             recipient = message.recipient
+           
             if recipient in self.connected_users:
                 self.connected_users[recipient].put(message)
+
+                  
+                
+                # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
+                # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
+                # print("SENDER:", sender)
+                # print("RECIPIENT:", recipient)
+
+
+                
+                MessageModel(sender = ObjectId(message.sender), recipient = ObjectId(recipient), 
+                                content = message.content,
+                                status = "DELIVERED").save()
+                
+
+                
                 
             else:
-                error_msg = chat_metadata_pb2.Message(
-                    message_id="0",
-                    sender="Server",
-                    content=f"User {recipient} is offline.",
-                    recipient=message.sender
-                )
-                sender_queue.put(error_msg)
+                # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
+                # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
+                # print("SENDER:", sender)
+                # print("RECIPIENT:", recipient)
+                
+                try:
+                    msg =  MessageModel(sender = ObjectId(message.sender), recipient = ObjectId(recipient), 
+                        content=message.content,
+                        status="SENT"
+                    ).save()
+                    print("Message saved with ID:", msg.id)
+
+                except (ValidationError, NotUniqueError) as e:
+                    print("Failed to save message:", e)
+
+
+                # error_msg = chat_metadata_pb2.Message(
+                #     message_id="0",
+                #     sender="Server",
+                #     content=f"User {recipient} is offline.",
+                #     recipient=message.sender
+                # )
+                # sender_queue.put(error_msg)
+
+
         
     
 

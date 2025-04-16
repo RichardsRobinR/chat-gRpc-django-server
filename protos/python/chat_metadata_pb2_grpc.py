@@ -35,7 +35,7 @@ class ChatServiceStub(object):
             channel: A grpc.Channel.
         """
         self.MessageStream = channel.stream_stream(
-                '/chat.ChatService/MessageStream',
+                '/connect.ChatService/MessageStream',
                 request_serializer=chat__metadata__pb2.Message.SerializeToString,
                 response_deserializer=chat__metadata__pb2.Message.FromString,
                 _registered_method=True)
@@ -61,9 +61,9 @@ def add_ChatServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'chat.ChatService', rpc_method_handlers)
+            'connect.ChatService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('chat.ChatService', rpc_method_handlers)
+    server.add_registered_method_handlers('connect.ChatService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -84,7 +84,7 @@ class ChatService(object):
         return grpc.experimental.stream_stream(
             request_iterator,
             target,
-            '/chat.ChatService/MessageStream',
+            '/connect.ChatService/MessageStream',
             chat__metadata__pb2.Message.SerializeToString,
             chat__metadata__pb2.Message.FromString,
             options,

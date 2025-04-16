@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-import user_metadata_pb2_grpc
 from server.services import UserService
+from server.services import ChatService
+from protos.python import  user_metadata_pb2_grpc 
+from protos.python import chat_metadata_pb2_grpc
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -26,3 +28,4 @@ urlpatterns = [
 def grpc_handlers(server):
     user_metadata_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
     # chat_metadata_pb2_grpc.add_ChatServiceServicer_to_server(ChatService(), server)
+    chat_metadata_pb2_grpc.add_ChatServiceServicer_to_server(ChatService(), server)
