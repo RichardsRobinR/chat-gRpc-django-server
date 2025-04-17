@@ -134,11 +134,20 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
         """Save message to database"""
 
         try:
+
+            # chat_room_ref = ChatMetaDataModel.objects(id=ObjectId(message.chat_room_ref)).first()
             msg =  MessageModel(sender_ref = ObjectId(message.sender_ref), recipient_ref = ObjectId(recipient), 
                 content=message.content,
                 status=status,
                 chat_room_ref = ObjectId(message.chat_room_ref),
             ).save()
+
+            chat = ChatMetaDataModel.objects.get(id=ObjectId(message.chat_room_ref))
+
+            chat.last_message = msg.to_embedded()
+
+            chat.save()
+            print("Message saved:", msg)
             print("Message saved with ID:", msg.id)
         except (ValidationError, NotUniqueError) as e:
             print("Failed to save message:", e)
@@ -170,10 +179,12 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 context.set_details('Phone number is required')
                 return chat_metadata_pb2.ChatResponse()
             
+            
             current_user_object_id = get_object_id_from_uid(current_user_uid)
             other_user_object_id = get_object_id_from_uid(other_user_uid)
             print("CURRENT USER objectid:", current_user_object_id)
             print("OTHER USER objectid:", other_user_object_id)
+
 
             sorted_participants_uids = sorted([current_user_uid, other_user_uid])
             # sorted_user_object_id = sorted([current_user_object_id, other_user_object_id])
@@ -200,8 +211,7 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             else:
                 chat_room = ChatMetaDataModel(
                     id=ObjectId(room_id),
-                    participants_uid= {current_user_uid: current_user_object_id, other_user_uid: other_user_object_id},
-                    last_message=None,
+                    participants_uid= {current_user_uid : current_user_object_id, other_user_uid: other_user_object_id},
                     chat_source=chat_source,
                     initiated_by_phone_number= current_user_phone_number
                 )

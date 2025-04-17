@@ -1,16 +1,8 @@
 from bson import ObjectId
-from .models import UserMetaDataModel ,MessageModel, ChatMetaDataModel
+from .models import UserMetaDataModel ,MessageModel, ChatMetaDataModel, MessageModelEmbedded
 from protos.python import user_metadata_pb2 
 from protos.python import chat_metadata_pb2
 
-def convert_objectid(data):
-    if isinstance(data, ObjectId):
-        return str(data)
-    elif isinstance(data, list):
-        return [convert_objectid(item) for item in data]
-    elif isinstance(data, dict):
-        return {k: convert_objectid(v) for k, v in data.items()}
-    return data
 
 class UserMetaDataGRPCSerializer:
     @staticmethod
@@ -44,11 +36,24 @@ class MessageGRPCSerializer:
     @staticmethod
     def to_proto(msg: MessageModel):
         data = {
-            "id": str(msg.id),
-            "sender_id": str(msg.sender_ref),
-            "recipient_id": str(msg.recipient_ref),
+            "id": str(msg.id) ,
+            "sender_ref": str(msg.sender_ref),
+            "recipient_ref": str(msg.recipient_ref),
             "content": msg.content,
-            "chat_room_id": str(msg.chat_room_ref),
+            "chat_room_ref": str(msg.chat_room_ref),
+            "status": msg.status,
+        }
+        return chat_metadata_pb2.Message(**data)
+    
+
+class MessageEmbeddedGRPCSerializer:
+    @staticmethod
+    def to_proto(msg: MessageModelEmbedded):
+        data = {
+            "sender_ref": str(msg.sender_ref),
+            "recipient_ref": str(msg.recipient_ref),
+            "content": msg.content,
+            "chat_room_ref": str(msg.chat_room_ref),
             "status": msg.status,
         }
         return chat_metadata_pb2.Message(**data)
@@ -60,7 +65,7 @@ class ChatMetaDataGRPCSerializer:
         data = {
             "id": str(chat.id),
             "participants_uid": {key : str(value) for key,value in (chat.participants_uid or {}).items()},
-            "last_message": MessageGRPCSerializer.to_proto(chat.last_message) if chat.last_message else None,
+            "last_message": MessageEmbeddedGRPCSerializer.to_proto(chat.last_message) if chat.last_message else None,
             "chat_source": chat.chat_source,
             "initiated_by_phone_number": chat.initiated_by_phone_number,
         }
