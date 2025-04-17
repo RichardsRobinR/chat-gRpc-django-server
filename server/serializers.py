@@ -1,6 +1,7 @@
 from bson import ObjectId
-from .models import UserMetaDataModel
+from .models import UserMetaDataModel ,MessageModel, ChatMetaDataModel
 from protos.python import user_metadata_pb2 
+from protos.python import chat_metadata_pb2
 
 def convert_objectid(data):
     if isinstance(data, ObjectId):
@@ -37,3 +38,32 @@ class UserMetaDataGRPCSerializer:
             "is_staff": user.is_staff,
         }
         return user_metadata_pb2.User(**data)
+
+
+class MessageGRPCSerializer:
+    @staticmethod
+    def to_proto(msg: MessageModel):
+        data = {
+            "id": str(msg.id),
+            "sender_id": str(msg.sender_ref),
+            "recipient_id": str(msg.recipient_ref),
+            "content": msg.content,
+            "chat_room_id": str(msg.chat_room_ref),
+            "status": msg.status,
+        }
+        return chat_metadata_pb2.Message(**data)
+    
+
+class ChatMetaDataGRPCSerializer:
+    @staticmethod
+    def to_proto(chat: ChatMetaDataModel):
+        data = {
+            "id": str(chat.id),
+            "participants_uid": {key : str(value) for key,value in (chat.participants_uid or {}).items()},
+            "last_message": MessageGRPCSerializer.to_proto(chat.last_message) if chat.last_message else None,
+            "chat_source": chat.chat_source,
+            "initiated_by_phone_number": chat.initiated_by_phone_number,
+        }
+        return chat_metadata_pb2.Chat(**data)
+
+#  {key: str(user.id) for key, user in participants_uid.items()}

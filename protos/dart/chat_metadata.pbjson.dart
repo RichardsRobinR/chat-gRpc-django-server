@@ -29,47 +29,87 @@ final $typed_data.Uint8List messageStatusDescriptor = $convert.base64Decode(
     'Cg1NZXNzYWdlU3RhdHVzEggKBFNFTlQQABINCglERUxJVkVSRUQQARIICgRSRUFEEAISCQoFRV'
     'JST1IQAw==');
 
+@$core.Deprecated('Use getOrCreateChatRoomRequestDescriptor instead')
+const GetOrCreateChatRoomRequest$json = {
+  '1': 'GetOrCreateChatRoomRequest',
+  '2': [
+    {'1': 'current_user_uid', '3': 1, '4': 1, '5': 9, '10': 'currentUserUid'},
+    {'1': 'other_user_uid', '3': 2, '4': 1, '5': 9, '10': 'otherUserUid'},
+    {'1': 'current_user_phone_number', '3': 3, '4': 1, '5': 9, '10': 'currentUserPhoneNumber'},
+    {'1': 'chat_source', '3': 4, '4': 1, '5': 9, '10': 'chatSource'},
+  ],
+};
+
+/// Descriptor for `GetOrCreateChatRoomRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getOrCreateChatRoomRequestDescriptor = $convert.base64Decode(
+    'ChpHZXRPckNyZWF0ZUNoYXRSb29tUmVxdWVzdBIoChBjdXJyZW50X3VzZXJfdWlkGAEgASgJUg'
+    '5jdXJyZW50VXNlclVpZBIkCg5vdGhlcl91c2VyX3VpZBgCIAEoCVIMb3RoZXJVc2VyVWlkEjkK'
+    'GWN1cnJlbnRfdXNlcl9waG9uZV9udW1iZXIYAyABKAlSFmN1cnJlbnRVc2VyUGhvbmVOdW1iZX'
+    'ISHwoLY2hhdF9zb3VyY2UYBCABKAlSCmNoYXRTb3VyY2U=');
+
 @$core.Deprecated('Use messageDescriptor instead')
 const Message$json = {
   '1': 'Message',
   '2': [
-    {'1': 'message_id', '3': 1, '4': 1, '5': 9, '10': 'messageId'},
-    {'1': 'sender', '3': 2, '4': 1, '5': 9, '10': 'sender'},
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'sender_ref', '3': 2, '4': 1, '5': 9, '10': 'senderRef'},
     {'1': 'content', '3': 3, '4': 1, '5': 9, '10': 'content'},
-    {'1': 'recipient', '3': 4, '4': 1, '5': 9, '10': 'recipient'},
+    {'1': 'recipient_ref', '3': 4, '4': 1, '5': 9, '10': 'recipientRef'},
     {'1': 'status', '3': 5, '4': 1, '5': 14, '6': '.connect.MessageStatus', '10': 'status'},
+    {'1': 'chat_room_ref', '3': 6, '4': 1, '5': 9, '10': 'chatRoomRef'},
   ],
 };
 
 /// Descriptor for `Message`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List messageDescriptor = $convert.base64Decode(
-    'CgdNZXNzYWdlEh0KCm1lc3NhZ2VfaWQYASABKAlSCW1lc3NhZ2VJZBIWCgZzZW5kZXIYAiABKA'
-    'lSBnNlbmRlchIYCgdjb250ZW50GAMgASgJUgdjb250ZW50EhwKCXJlY2lwaWVudBgEIAEoCVIJ'
-    'cmVjaXBpZW50Ei4KBnN0YXR1cxgFIAEoDjIWLmNvbm5lY3QuTWVzc2FnZVN0YXR1c1IGc3RhdH'
-    'Vz');
+    'CgdNZXNzYWdlEg4KAmlkGAEgASgJUgJpZBIdCgpzZW5kZXJfcmVmGAIgASgJUglzZW5kZXJSZW'
+    'YSGAoHY29udGVudBgDIAEoCVIHY29udGVudBIjCg1yZWNpcGllbnRfcmVmGAQgASgJUgxyZWNp'
+    'cGllbnRSZWYSLgoGc3RhdHVzGAUgASgOMhYuY29ubmVjdC5NZXNzYWdlU3RhdHVzUgZzdGF0dX'
+    'MSIgoNY2hhdF9yb29tX3JlZhgGIAEoCVILY2hhdFJvb21SZWY=');
+
+@$core.Deprecated('Use chatResponseDescriptor instead')
+const ChatResponse$json = {
+  '1': 'ChatResponse',
+  '2': [
+    {'1': 'chat', '3': 1, '4': 1, '5': 11, '6': '.connect.Chat', '10': 'chat'},
+  ],
+};
+
+/// Descriptor for `ChatResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List chatResponseDescriptor = $convert.base64Decode(
+    'CgxDaGF0UmVzcG9uc2USIQoEY2hhdBgBIAEoCzINLmNvbm5lY3QuQ2hhdFIEY2hhdA==');
 
 @$core.Deprecated('Use chatDescriptor instead')
 const Chat$json = {
   '1': 'Chat',
   '2': [
-    {'1': 'chat_id', '3': 1, '4': 1, '5': 9, '10': 'chatId'},
-    {'1': 'chat_type', '3': 2, '4': 1, '5': 9, '10': 'chatType'},
-    {'1': 'participants', '3': 3, '4': 3, '5': 11, '6': '.connect.User', '10': 'participants'},
-    {'1': 'created_at', '3': 4, '4': 1, '5': 9, '10': 'createdAt'},
-    {'1': 'updated_at', '3': 5, '4': 1, '5': 9, '10': 'updatedAt'},
-    {'1': 'last_message', '3': 6, '4': 1, '5': 11, '6': '.connect.Message', '10': 'lastMessage'},
-    {'1': 'group_metadata', '3': 7, '4': 1, '5': 11, '6': '.connect.GroupMetaData', '10': 'groupMetadata'},
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'participants_uid', '3': 2, '4': 3, '5': 11, '6': '.connect.Chat.ParticipantsUidEntry', '10': 'participantsUid'},
+    {'1': 'last_message', '3': 3, '4': 1, '5': 11, '6': '.connect.Message', '10': 'lastMessage'},
+    {'1': 'chat_source', '3': 4, '4': 1, '5': 9, '10': 'chatSource'},
+    {'1': 'initiated_by_phone_number', '3': 5, '4': 1, '5': 8, '10': 'initiatedByPhoneNumber'},
   ],
+  '3': [Chat_ParticipantsUidEntry$json],
+};
+
+@$core.Deprecated('Use chatDescriptor instead')
+const Chat_ParticipantsUidEntry$json = {
+  '1': 'ParticipantsUidEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': {'7': true},
 };
 
 /// Descriptor for `Chat`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List chatDescriptor = $convert.base64Decode(
-    'CgRDaGF0EhcKB2NoYXRfaWQYASABKAlSBmNoYXRJZBIbCgljaGF0X3R5cGUYAiABKAlSCGNoYX'
-    'RUeXBlEjEKDHBhcnRpY2lwYW50cxgDIAMoCzINLmNvbm5lY3QuVXNlclIMcGFydGljaXBhbnRz'
-    'Eh0KCmNyZWF0ZWRfYXQYBCABKAlSCWNyZWF0ZWRBdBIdCgp1cGRhdGVkX2F0GAUgASgJUgl1cG'
-    'RhdGVkQXQSMwoMbGFzdF9tZXNzYWdlGAYgASgLMhAuY29ubmVjdC5NZXNzYWdlUgtsYXN0TWVz'
-    'c2FnZRI9Cg5ncm91cF9tZXRhZGF0YRgHIAEoCzIWLmNvbm5lY3QuR3JvdXBNZXRhRGF0YVINZ3'
-    'JvdXBNZXRhZGF0YQ==');
+    'CgRDaGF0Eg4KAmlkGAEgASgJUgJpZBJNChBwYXJ0aWNpcGFudHNfdWlkGAIgAygLMiIuY29ubm'
+    'VjdC5DaGF0LlBhcnRpY2lwYW50c1VpZEVudHJ5Ug9wYXJ0aWNpcGFudHNVaWQSMwoMbGFzdF9t'
+    'ZXNzYWdlGAMgASgLMhAuY29ubmVjdC5NZXNzYWdlUgtsYXN0TWVzc2FnZRIfCgtjaGF0X3NvdX'
+    'JjZRgEIAEoCVIKY2hhdFNvdXJjZRI5Chlpbml0aWF0ZWRfYnlfcGhvbmVfbnVtYmVyGAUgASgI'
+    'UhZpbml0aWF0ZWRCeVBob25lTnVtYmVyGkIKFFBhcnRpY2lwYW50c1VpZEVudHJ5EhAKA2tleR'
+    'gBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
 
 @$core.Deprecated('Use groupMetaDataDescriptor instead')
 const GroupMetaData$json = {

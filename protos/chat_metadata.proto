@@ -8,26 +8,44 @@ import "user_metadata.proto";
 service ChatService {
   // Bidirectional streaming for real-time chat
   rpc MessageStream(stream Message) returns (stream Message);
-  
+  rpc ChatRoom(GetOrCreateChatRoomRequest) returns (ChatResponse);
+}
+
+message GetOrCreateChatRoomRequest {
+  string current_user_uid = 1;
+  string other_user_uid = 2;
+  string current_user_phone_number = 3;
+  string chat_source = 4; // "phone_number" or "uuid"
 }
 
 message Message {
-  string message_id = 1;
-  string sender = 2;
+  string id = 1;
+  string sender_ref = 2;
   string content = 3;
-  string recipient = 4;
+  string recipient_ref = 4;
   MessageStatus status = 5;
+  string chat_room_ref = 6;
 
 }
 
+message ChatResponse {
+  Chat chat = 1;
+}
+
 message Chat {
-  string chat_id = 1;
-  string chat_type = 2; // 'individual' or 'group'
-  repeated connect.User participants = 3;
-  string created_at = 4;
-  string updated_at = 5;
-  Message last_message = 6;
-  GroupMetaData group_metadata = 7; // Only for group chats
+  string id = 1;
+  map<string, string> participants_uid = 2;
+  Message last_message = 3;
+  string chat_source = 4; 
+  bool initiated_by_phone_number = 5;
+
+
+
+  // repeated connect.User participants = 3;
+  // string created_at = 4;
+  // string updated_at = 5;
+  // Message last_message = 6;
+  // GroupMetaData group_metadata = 7; // Only for group chats
 }
 
 message GroupMetaData {

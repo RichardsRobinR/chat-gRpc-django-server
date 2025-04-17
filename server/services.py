@@ -1,6 +1,6 @@
 from .models import UserMetaDataModel , MessageModel ,ChatMetaDataModel , GroupMetaData
-
-from .serializers import UserMetaDataGRPCSerializer
+import hashlib
+from .serializers import UserMetaDataGRPCSerializer ,MessageGRPCSerializer, ChatMetaDataGRPCSerializer
 import threading
 import queue
 import grpc
@@ -8,8 +8,7 @@ from protos.python import user_metadata_pb2_grpc , user_metadata_pb2
 from protos.python import chat_metadata_pb2_grpc , chat_metadata_pb2
 from bson import ObjectId
 from mongoengine import ValidationError, NotUniqueError
-
-
+from .utils.mongo_utils import get_uuid_from_uid , generate_custom_Uuid , get_object_id_from_uid
 
 
 class UserService(user_metadata_pb2_grpc.UserServiceServicer):
@@ -23,6 +22,8 @@ class UserService(user_metadata_pb2_grpc.UserServiceServicer):
             return user_metadata_pb2.UserResponse()
         
         print("omggg")
+
+        print("type USER:", type(user))
 
         user_proto = UserMetaDataGRPCSerializer.to_proto(user)
 
@@ -42,15 +43,21 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
         try:
             # Get first message to identify sender and initialize queue
             first_message = next(request_iterator)
-            sender = first_message.sender
+            sender = first_message.sender_ref
+            print("SENDER:", sender)
+            print("FIRST MESSAGE:", first_message.sender_ref)
             
             with self.lock:
                 if sender not in self.connected_users:
                     my_queue = queue.Queue()
                     self.connected_users[sender] = my_queue
                     print(f"User {sender} connected. Total users: {len(self.connected_users)}")
+                    # MessageModel.objects.get()
+                    unsent_messages = MessageModel.objects(sender_ref=ObjectId(sender),chat_room_ref=ObjectId(first_message.chat_room_ref))
+                    print("UNSENT MESSAGES:", unsent_messages)
+
                 else:
-                    my_queue = self.connected_users[sender]
+                    my_queue = self.connected_users[sender]  # Get existing queue
 
             # Start message processing thread
             def process_messages():
@@ -87,44 +94,32 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
         """Route message to recipient or send error if offline"""
         if message.content == "__join__":
             return  # Don't forward join messages
-        with self.lock:
-            recipient = message.recipient
-           
-            if recipient in self.connected_users:
-                self.connected_users[recipient].put(message)
+        
+        if message.content == "__leave__":
+            del self.connected_users[message.sender_ref]
+            print(f"User {message.sender} disconnected. Total users: {len(self.connected_users)}")
+            return  # Don't forward leave messages
 
-                  
+        with self.lock:
+            recipient_ref = message.recipient_ref
+           
+            if recipient_ref in self.connected_users:
+                self.connected_users[recipient_ref].put(message)
                 
                 # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
                 # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
                 # print("SENDER:", sender)
                 # print("RECIPIENT:", recipient)
 
-
-                
-                MessageModel(sender = ObjectId(message.sender), recipient = ObjectId(recipient), 
-                                content = message.content,
-                                status = "DELIVERED").save()
-                
-
-                
+                self._db_send_message(message, recipient_ref, status="DELIVERED")
                 
             else:
                 # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
                 # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
                 # print("SENDER:", sender)
                 # print("RECIPIENT:", recipient)
-                
-                try:
-                    msg =  MessageModel(sender = ObjectId(message.sender), recipient = ObjectId(recipient), 
-                        content=message.content,
-                        status="SENT"
-                    ).save()
-                    print("Message saved with ID:", msg.id)
 
-                except (ValidationError, NotUniqueError) as e:
-                    print("Failed to save message:", e)
-
+                self._db_send_message(message, recipient_ref, status="SENT")
 
                 # error_msg = chat_metadata_pb2.Message(
                 #     message_id="0",
@@ -135,6 +130,107 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 # sender_queue.put(error_msg)
 
 
+    def _db_send_message(self,message, recipient, status):
+        """Save message to database"""
+
+        try:
+            msg =  MessageModel(sender_ref = ObjectId(message.sender_ref), recipient_ref = ObjectId(recipient), 
+                content=message.content,
+                status=status,
+                chat_room_ref = ObjectId(message.chat_room_ref),
+            ).save()
+            print("Message saved with ID:", msg.id)
+        except (ValidationError, NotUniqueError) as e:
+            print("Failed to save message:", e)
+
+    
+    def ChatRoom(self, request, context):
+        try:
+            current_user_uid = request.current_user_uid
+            other_user_uid = request.other_user_uid
+            current_user_phone_number = request.current_user_phone_number
+            chat_source = request.chat_source
+            print("CURRENT USER UID:", current_user_uid)
+            print("OTHER USER UID:", other_user_uid)
+            print("CURRENT USER PHONE NUMBER:", current_user_phone_number)
+            print("CHAT SOURCE:", chat_source)
+
+            if not current_user_uid or not other_user_uid:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details('User IDs are required')
+                return chat_metadata_pb2.ChatResponse()
+
+            if current_user_uid == other_user_uid:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details('Cannot chat with yourself')
+                return chat_metadata_pb2.ChatResponse()
+            
+            if not current_user_phone_number:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details('Phone number is required')
+                return chat_metadata_pb2.ChatResponse()
+            
+            current_user_object_id = get_object_id_from_uid(current_user_uid)
+            other_user_object_id = get_object_id_from_uid(other_user_uid)
+            print("CURRENT USER objectid:", current_user_object_id)
+            print("OTHER USER objectid:", other_user_object_id)
+
+            sorted_participants_uids = sorted([current_user_uid, other_user_uid])
+            # sorted_user_object_id = sorted([current_user_object_id, other_user_object_id])
+
+            room_id = f"{sorted_participants_uids[0]}_{sorted_participants_uids[1]}"
+            print("ROOM ID:", room_id)
+
+            if isinstance(room_id, str):
+                data = room_id.encode()
+                sha256_hash = hashlib.sha256(data).hexdigest()
+                print("SHA256 Hash:", sha256_hash)
+                room_id = sha256_hash[:24]
+            else:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details('Hashing failed')
+                return chat_metadata_pb2.ChatResponse()
+            
+            print("Hashed ROOM ID:", room_id)
+
+            # Check if chat room already exists
+            chat_room = ChatMetaDataModel.objects(id=room_id).first()
+            if chat_room:
+                print("Chat room already exists:", chat_room)
+            else:
+                chat_room = ChatMetaDataModel(
+                    id=ObjectId(room_id),
+                    participants_uid= {current_user_uid: current_user_object_id, other_user_uid: other_user_object_id},
+                    last_message=None,
+                    chat_source=chat_source,
+                    initiated_by_phone_number= current_user_phone_number
+                )
+                chat_room.save()
+                print("Chat room created:", chat_room)
+
+            
+            print("type chat romm:", type(chat_room))
+
+            print("chat room id",chat_room.id)
+
+
+
+
+            # Convert to protobuf message
+            chat_proto = ChatMetaDataGRPCSerializer.to_proto(chat_room)
+            print("Chat room protobuf:", chat_proto)
+            return chat_metadata_pb2.ChatResponse(chat=chat_proto)
+        except Exception as e:
+            print(f"Error in ChatRoom: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details('Internal server error')
+            return chat_metadata_pb2.ChatResponse()
         
+    
+
+            
+            
+
+
     
 

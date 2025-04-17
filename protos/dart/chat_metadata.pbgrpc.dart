@@ -25,6 +25,10 @@ class ChatServiceClient extends $grpc.Client {
       '/connect.ChatService/MessageStream',
       ($1.Message value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.Message.fromBuffer(value));
+  static final _$chatRoom = $grpc.ClientMethod<$1.GetOrCreateChatRoomRequest, $1.ChatResponse>(
+      '/connect.ChatService/ChatRoom',
+      ($1.GetOrCreateChatRoomRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.ChatResponse.fromBuffer(value));
 
   ChatServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -34,6 +38,10 @@ class ChatServiceClient extends $grpc.Client {
 
   $grpc.ResponseStream<$1.Message> messageStream($async.Stream<$1.Message> request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$messageStream, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$1.ChatResponse> chatRoom($1.GetOrCreateChatRoomRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$chatRoom, request, options: options);
   }
 }
 
@@ -49,7 +57,19 @@ abstract class ChatServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $1.Message.fromBuffer(value),
         ($1.Message value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.GetOrCreateChatRoomRequest, $1.ChatResponse>(
+        'ChatRoom',
+        chatRoom_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.GetOrCreateChatRoomRequest.fromBuffer(value),
+        ($1.ChatResponse value) => value.writeToBuffer()));
+  }
+
+  $async.Future<$1.ChatResponse> chatRoom_Pre($grpc.ServiceCall $call, $async.Future<$1.GetOrCreateChatRoomRequest> $request) async {
+    return chatRoom($call, await $request);
   }
 
   $async.Stream<$1.Message> messageStream($grpc.ServiceCall call, $async.Stream<$1.Message> request);
+  $async.Future<$1.ChatResponse> chatRoom($grpc.ServiceCall call, $1.GetOrCreateChatRoomRequest request);
 }

@@ -30,23 +30,46 @@ class UserMetaDataModel(me.Document):
         return self.username
     
 
+class MessageModel(me.Document):
+    meta = {'collection': 'snap_messages'}
+
+    # id = me.ObjectIdField(primary_key=True)
+    # chat_id = me.ReferenceField('ChatMetaDataModel', required=True)  # Reference to the chat
+    sender_ref = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the sender
+    recipient_ref = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the recipient
+    content = me.StringField(required=True)
+    chat_room_ref = me.ReferenceField('ChatMetaDataModel', required=True)  # Reference to the chat room
+    # timestamp = me.DateTimeField(required=True)
+    # message_type = me.StringField(max_length=20, required=True)  # e.g., 'text', 'image', 'video'
+    status = me.StringField(max_length=20, default='sent')  # e.g., 'sent', 'delivered', 'read'
+
+    def __str__(self):
+        return f"Message({str(self.id)})"
+
+
 class ChatMetaDataModel(me.Document):
-    meta = {'collection': 'snap_chatmeta'}
+    meta = {'collection': 'snap_chat_rooms'}
 
     # Core fields
     id = me.ObjectIdField(primary_key=True)
-    chat_id = me.StringField(max_length=128, unique=True, required=True)
-    chat_type = me.StringField(max_length=20, required=True)  # e.g., 'individual', 'group'
-    participants = me.ListField(me.ReferenceField('UserMetaDataModel'))  # Array of User references
-    created_at = me.DateTimeField(required=True)
-    updated_at = me.DateTimeField()
+    # chat_id = me.StringField(max_length=128, unique=True, required=True)
+    # chat_type = me.StringField(max_length=20, required=True)  # e.g., 'individual', 'group'
+    
+    # participants_uid = me.ListField(me.ReferenceField(''))  # Array of User references
+    participants_uid  = me.DictField()  # Dictionary of User references
+    last_message = me.ReferenceField('MessageModel',required=False, null=True, reverse_delete_rule=me.NULLIFY)  # Reference to the most recent message
+    chat_source = me.StringField(max_length=20)  # e.g., 'phonenumber'
+    initiated_by_phone_number = me.BooleanField(default=False)  # True if the chat was initiated by a phone number
+    
+    # created_at = me.DateTimeField(required=True)
+    # updated_at = me.DateTimeField()
     # last_message = me.ReferenceField('MessageModel')  # Reference to the most recent message
 
     # Group metadata (only for group chats)
     # group_metadata = me.EmbeddedDocumentField('GroupMetaData', null=True)
 
     def __str__(self):
-        return self.chat_id
+        return f"ChatMetaDataModel({str(self.id)})"
 
 class GroupMetaData(me.EmbeddedDocument):
     name = me.StringField(max_length=100)
@@ -57,17 +80,3 @@ class GroupMetaData(me.EmbeddedDocument):
     profile_picture = me.StringField()  # URL or file reference
 
 
-class MessageModel(me.Document):
-    meta = {'collection': 'snap_messages'}
-
-    # message_id = me.StringField(max_length=128, unique=True, required=True)
-    # chat_id = me.ReferenceField('ChatMetaDataModel', required=True)  # Reference to the chat
-    sender = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the sender
-    recipient = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the recipient
-    content = me.StringField(required=True)
-    # timestamp = me.DateTimeField(required=True)
-    # message_type = me.StringField(max_length=20, required=True)  # e.g., 'text', 'image', 'video'
-    status = me.StringField(max_length=20, default='sent')  # e.g., 'sent', 'delivered', 'read'
-
-    def __str__(self):
-        return self.message_id
