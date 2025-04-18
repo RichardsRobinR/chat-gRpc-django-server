@@ -11,6 +11,7 @@ from mongoengine import ValidationError, NotUniqueError
 from .utils.mongo_utils import get_uuid_from_uid , generate_custom_Uuid , get_object_id_from_uid
 import logging
 log = logging.getLogger(__name__)
+import time
 
 class UserService(user_metadata_pb2_grpc.UserServiceServicer):
     def GetUser(self, request, context):
@@ -32,6 +33,75 @@ class UserService(user_metadata_pb2_grpc.UserServiceServicer):
         print("okokokk")
         return user_metadata_pb2.UserResponse(user=user_proto)
     
+    def CreateUser(self, request, context):
+        # uid ,uuid,username , phonenumber ,( profile_picture_url -> optional)
+        log.info("CreateUser called")
+        try:
+            uid = request.user.uid or None
+            uuid = request.user.uuid or None
+            username = request.user.username or None
+            phone_number = request.user.phone_number or None
+            profile_image_url = request.user.profile_image_url or None
+            
+            
+            # Generate the display name
+            display_name = "sc-" + username
+            print("DISPLAY NAME:", display_name)
+
+            
+            print("UID:", uid)
+            print("UUID:", uuid)
+            print("USERNAME:", username)
+            print("PHONE NUMBER:", phone_number)
+            print("PROFILE IMAGE URL:", profile_image_url)
+
+
+            if not uid or not uuid or not username or not phone_number:
+                log.error("All fields are present")
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'All fields are required')
+
+            if len(uuid) != 6:
+                log.error("Invalid UUID length")
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Invalid UUID length')
+
+            # Check if user already exists
+            existing_user = UserMetaDataModel.objects(uid=uid).first()
+            if existing_user:
+                # context.set_code(grpc.StatusCode.ALREADY_EXISTS)
+                # context.set_details('User already exists')
+                log.error("User already exists")
+                context.abort(grpc.StatusCode.ALREADY_EXISTS, 'User already exists')
+
+
+            profile_image_url = request.User.profile_image_url if request.user.profile_image_url else None
+            log.info(f"Profile image URL: {profile_image_url}")
+
+            # Create new user
+            new_user = UserMetaDataModel(
+                uid=uid,
+                uuid=uuid,
+                username=username,
+                phone_number=phone_number,
+                display_name=display_name,
+                profile_image_url=profile_image_url,
+                created_at = int(time.time() * 1000)
+            )
+                
+            
+            new_user.save()
+            log.info(f"User created successfully: {new_user}")
+
+            user_proto = UserMetaDataGRPCSerializer.to_proto(new_user)
+            log.info(f"CreatUser completed successfully:")
+            return user_metadata_pb2.UserResponse(user=user_proto)
+
+        except grpc.RpcError as e:
+            log.error(f"gRPC Error in CreateUser: {e.code()}: {e.details()}")
+            raise
+            # context.set_code(grpc.StatusCode.INTERNAL)
+            # context.set_details('Internal server error')
+            # return user_metadata_pb2.UserResponse()
+            
 
 class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
 
@@ -155,33 +225,32 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
 
     
     def ChatRoom(self, request, context):
+        log.info("ChatRoom called")
         try:
             current_user_uid = request.current_user_uid
             other_user_uid = request.other_user_uid
             current_user_phone_number = request.current_user_phone_number
-            chat_source = request.chat_source
-            log.debug(f"CURRENT USER UID: {current_user_uid}")
-            # log.debug("OTHER USER UID:", other_user_uid)
-            # log.debug("CURRENT USER PHONE NUMBER:", current_user_phone_number)
-            # log.debug("CHAT SOURCE:", chat_source)
+            chat_source_value = request.chat_source
+            chat_source_enum_name = chat_metadata_pb2.ChatSource.Name(chat_source_value)
+            print(f"CURRENT USER UID: {current_user_uid}")
+            print("OTHER USER UID:", other_user_uid)
+            print("CURRENT USER PHONE NUMBER:", current_user_phone_number)
+            print("CHAT SOURCE:", chat_source_value)
+            print("CHAT SOURCE ENUM:", chat_source_enum_name)
 
             log.debug("Harmless debug Message")
             log.info("Info Message")
 
             if not current_user_uid or not other_user_uid:
-                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                context.set_details('User IDs are required')
-                return chat_metadata_pb2.ChatResponse()
+                # context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                # context.set_details('User IDs are required')
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'User IDs are required')
 
             if current_user_uid == other_user_uid:
-                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                context.set_details('Cannot chat with yourself')
-                return chat_metadata_pb2.ChatResponse()
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Cannot chat with yourself')
             
             if not current_user_phone_number:
-                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                context.set_details('Phone number is required')
-                return chat_metadata_pb2.ChatResponse()
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Phone number is required')
             
             
             current_user_object_id = get_object_id_from_uid(current_user_uid)
@@ -202,9 +271,7 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 print("SHA256 Hash:", sha256_hash)
                 room_id = sha256_hash[:24]
             else:
-                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                context.set_details('Hashing failed')
-                return chat_metadata_pb2.ChatResponse()
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Hashing failed')
             
             print("Hashed ROOM ID:", room_id)
 
@@ -216,32 +283,28 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 chat_room = ChatMetaDataModel(
                     id=ObjectId(room_id),
                     participants_uid= {current_user_uid : current_user_object_id, other_user_uid: other_user_object_id},
-                    chat_source=chat_source,
+                    chat_source=  chat_source_enum_name ,
                     initiated_by_phone_number= current_user_phone_number,
                     last_message="",
                 )
                 chat_room.save()
                 print("Chat room created:", chat_room)
 
-            
             print("type chat romm:", type(chat_room))
 
             print("chat room id",chat_room.id)
             print("last message", chat_room.last_message)
             
-
-
-
-
             # Convert to protobuf message
             chat_proto = ChatMetaDataGRPCSerializer.to_proto(chat_room)
             print("Chat room protobuf:", chat_proto)
             return chat_metadata_pb2.ChatResponse(chat=chat_proto)
-        except Exception as e:
+        except grpc.RpcError as e:
             print(f"Error in ChatRoom: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details('Internal server error')
-            return chat_metadata_pb2.ChatResponse()
+            # return chat_metadata_pb2.ChatResponse()
+            raise
         
     
     def VerifyUuid(self, request, context):
@@ -250,21 +313,27 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             uuid = request.uuid
             print("UUID:", uuid)
             if len(uuid) != 6:
-                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                context.set_details('Invalid UUID length')
+                # context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                # context.set_details('Invalid UUID length')
+                log.error("Invalid UUID length")
                 context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Invalid UUID length')
 
-            user_metadata = UserMetaDataModel.object(uuid=uuid).first()
-            print("USER METADATA:", user_metadata)
+            user = UserMetaDataModel.objects(uuid=uuid).first()
+            print("USER:", user)
             
-            if not user_metadata:
+            if user == None:
+                log.error("User not found")
                 context.abort(grpc.StatusCode.NOT_FOUND, 'User not found')
 
+            user_proto = UserMetaDataGRPCSerializer.to_proto(user)
+
             log.info("VerifyUuid finished")
-            return chat_metadata_pb2.VerifyUuidResponse(uuid=uuid)
-        except Exception as e:
+            return chat_metadata_pb2.VerifyUuidResponse(user=user_proto)
+        except grpc.RpcError as e:  
             print(f"Error in VerifyUuid: {e}")
-            return chat_metadata_pb2.VerifyUuidResponse(uuid=None)
+            log.error(f"gRPC Error in VerifyUuid: {e.code()}: {e.details()}")
+            raise
+            # return chat_metadata_pb2.VerifyUuidResponse(user=None)
        
 
             

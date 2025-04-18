@@ -16,7 +16,7 @@ message GetOrCreateChatRoomRequest {
   string current_user_uid = 1;
   string other_user_uid = 2;
   string current_user_phone_number = 3;
-  string chat_source = 4; // "phone_number" or "uuid"
+  ChatSource chat_source = 4; // "phone_number" or "uuid"
 }
 
 message Message {
@@ -37,7 +37,7 @@ message Chat {
   string id = 1;
   map<string, string> participants_uid = 2;
   string last_message = 3;
-  string chat_source = 4; 
+  ChatSource chat_source = 4; 
   bool initiated_by_phone_number = 5;
 
 
@@ -63,6 +63,11 @@ enum MessageStatus {
   DELIVERED = 1; // Message delivered to recipient
   READ = 2; // Message read by recipient
   ERROR = 3; // Error in sending message
+}
+
+enum ChatSource {
+  PHONE_NUMBER = 0; // Chat initiated via phone number
+  UUID = 1; // Chat initiated via UUID
 }
 
 message VerifyUuidRequest {

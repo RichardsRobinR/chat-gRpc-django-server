@@ -32,5 +32,20 @@ class MessageStatus extends $pb.ProtobufEnum {
   const MessageStatus._(super.v, super.n);
 }
 
+class ChatSource extends $pb.ProtobufEnum {
+  static const ChatSource PHONE_NUMBER = ChatSource._(0, _omitEnumNames ? '' : 'PHONE_NUMBER');
+  static const ChatSource UUID = ChatSource._(1, _omitEnumNames ? '' : 'UUID');
+
+  static const $core.List<ChatSource> values = <ChatSource> [
+    PHONE_NUMBER,
+    UUID,
+  ];
+
+  static final $core.Map<$core.int, ChatSource> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static ChatSource? valueOf($core.int value) => _byValue[value];
+
+  const ChatSource._(super.v, super.n);
+}
+
 
 const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

@@ -8,14 +8,14 @@ class UserMetaDataModel(me.Document):
     uuid = me.StringField(max_length=6, unique=True, required=True)
     username = me.StringField(max_length=50, unique=True, required=True)
     display_name = me.StringField(max_length=100, required=True)
-    profile_image_url = me.URLField()
+    profile_image_url = me.URLField(required=False)
     phone_number = me.StringField(max_length=20, required=True)
     bio = me.StringField()
 
     is_online = me.BooleanField(default=False)
     has_story = me.BooleanField(default=False)
     last_seen = me.LongField(default=0)
-    created_at = me.LongField(default=0)
+    created_at = me.LongField(default=0,required=True)
     last_login = me.LongField(default=0)
 
     group_id = me.ListField(me.StringField())

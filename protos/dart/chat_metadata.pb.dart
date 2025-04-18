@@ -25,7 +25,7 @@ class GetOrCreateChatRoomRequest extends $pb.GeneratedMessage {
     $core.String? currentUserUid,
     $core.String? otherUserUid,
     $core.String? currentUserPhoneNumber,
-    $core.String? chatSource,
+    ChatSource? chatSource,
   }) {
     final $result = create();
     if (currentUserUid != null) {
@@ -50,7 +50,7 @@ class GetOrCreateChatRoomRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'currentUserUid')
     ..aOS(2, _omitFieldNames ? '' : 'otherUserUid')
     ..aOS(3, _omitFieldNames ? '' : 'currentUserPhoneNumber')
-    ..aOS(4, _omitFieldNames ? '' : 'chatSource')
+    ..e<ChatSource>(4, _omitFieldNames ? '' : 'chatSource', $pb.PbFieldType.OE, defaultOrMaker: ChatSource.PHONE_NUMBER, valueOf: ChatSource.valueOf, enumValues: ChatSource.values)
     ..hasRequiredFields = false
   ;
 
@@ -103,9 +103,9 @@ class GetOrCreateChatRoomRequest extends $pb.GeneratedMessage {
   void clearCurrentUserPhoneNumber() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $core.String get chatSource => $_getSZ(3);
+  ChatSource get chatSource => $_getN(3);
   @$pb.TagNumber(4)
-  set chatSource($core.String v) { $_setString(3, v); }
+  set chatSource(ChatSource v) { $_setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasChatSource() => $_has(3);
   @$pb.TagNumber(4)
@@ -289,7 +289,7 @@ class Chat extends $pb.GeneratedMessage {
     $core.String? id,
     $pb.PbMap<$core.String, $core.String>? participantsUid,
     $core.String? lastMessage,
-    $core.String? chatSource,
+    ChatSource? chatSource,
     $core.bool? initiatedByPhoneNumber,
   }) {
     final $result = create();
@@ -318,7 +318,7 @@ class Chat extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'participantsUid', entryClassName: 'Chat.ParticipantsUidEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('connect'))
     ..aOS(3, _omitFieldNames ? '' : 'lastMessage')
-    ..aOS(4, _omitFieldNames ? '' : 'chatSource')
+    ..e<ChatSource>(4, _omitFieldNames ? '' : 'chatSource', $pb.PbFieldType.OE, defaultOrMaker: ChatSource.PHONE_NUMBER, valueOf: ChatSource.valueOf, enumValues: ChatSource.values)
     ..aOB(5, _omitFieldNames ? '' : 'initiatedByPhoneNumber')
     ..hasRequiredFields = false
   ;
@@ -366,9 +366,9 @@ class Chat extends $pb.GeneratedMessage {
   void clearLastMessage() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $core.String get chatSource => $_getSZ(3);
+  ChatSource get chatSource => $_getN(3);
   @$pb.TagNumber(4)
-  set chatSource($core.String v) { $_setString(3, v); }
+  set chatSource(ChatSource v) { $_setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasChatSource() => $_has(3);
   @$pb.TagNumber(4)

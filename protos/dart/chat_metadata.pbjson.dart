@@ -29,6 +29,19 @@ final $typed_data.Uint8List messageStatusDescriptor = $convert.base64Decode(
     'Cg1NZXNzYWdlU3RhdHVzEggKBFNFTlQQABINCglERUxJVkVSRUQQARIICgRSRUFEEAISCQoFRV'
     'JST1IQAw==');
 
+@$core.Deprecated('Use chatSourceDescriptor instead')
+const ChatSource$json = {
+  '1': 'ChatSource',
+  '2': [
+    {'1': 'PHONE_NUMBER', '2': 0},
+    {'1': 'UUID', '2': 1},
+  ],
+};
+
+/// Descriptor for `ChatSource`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List chatSourceDescriptor = $convert.base64Decode(
+    'CgpDaGF0U291cmNlEhAKDFBIT05FX05VTUJFUhAAEggKBFVVSUQQAQ==');
+
 @$core.Deprecated('Use getOrCreateChatRoomRequestDescriptor instead')
 const GetOrCreateChatRoomRequest$json = {
   '1': 'GetOrCreateChatRoomRequest',
@@ -36,7 +49,7 @@ const GetOrCreateChatRoomRequest$json = {
     {'1': 'current_user_uid', '3': 1, '4': 1, '5': 9, '10': 'currentUserUid'},
     {'1': 'other_user_uid', '3': 2, '4': 1, '5': 9, '10': 'otherUserUid'},
     {'1': 'current_user_phone_number', '3': 3, '4': 1, '5': 9, '10': 'currentUserPhoneNumber'},
-    {'1': 'chat_source', '3': 4, '4': 1, '5': 9, '10': 'chatSource'},
+    {'1': 'chat_source', '3': 4, '4': 1, '5': 14, '6': '.connect.ChatSource', '10': 'chatSource'},
   ],
 };
 
@@ -45,7 +58,7 @@ final $typed_data.Uint8List getOrCreateChatRoomRequestDescriptor = $convert.base
     'ChpHZXRPckNyZWF0ZUNoYXRSb29tUmVxdWVzdBIoChBjdXJyZW50X3VzZXJfdWlkGAEgASgJUg'
     '5jdXJyZW50VXNlclVpZBIkCg5vdGhlcl91c2VyX3VpZBgCIAEoCVIMb3RoZXJVc2VyVWlkEjkK'
     'GWN1cnJlbnRfdXNlcl9waG9uZV9udW1iZXIYAyABKAlSFmN1cnJlbnRVc2VyUGhvbmVOdW1iZX'
-    'ISHwoLY2hhdF9zb3VyY2UYBCABKAlSCmNoYXRTb3VyY2U=');
+    'ISNAoLY2hhdF9zb3VyY2UYBCABKA4yEy5jb25uZWN0LkNoYXRTb3VyY2VSCmNoYXRTb3VyY2U=');
 
 @$core.Deprecated('Use messageDescriptor instead')
 const Message$json = {
@@ -86,7 +99,7 @@ const Chat$json = {
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'participants_uid', '3': 2, '4': 3, '5': 11, '6': '.connect.Chat.ParticipantsUidEntry', '10': 'participantsUid'},
     {'1': 'last_message', '3': 3, '4': 1, '5': 9, '10': 'lastMessage'},
-    {'1': 'chat_source', '3': 4, '4': 1, '5': 9, '10': 'chatSource'},
+    {'1': 'chat_source', '3': 4, '4': 1, '5': 14, '6': '.connect.ChatSource', '10': 'chatSource'},
     {'1': 'initiated_by_phone_number', '3': 5, '4': 1, '5': 8, '10': 'initiatedByPhoneNumber'},
   ],
   '3': [Chat_ParticipantsUidEntry$json],
@@ -106,10 +119,10 @@ const Chat_ParticipantsUidEntry$json = {
 final $typed_data.Uint8List chatDescriptor = $convert.base64Decode(
     'CgRDaGF0Eg4KAmlkGAEgASgJUgJpZBJNChBwYXJ0aWNpcGFudHNfdWlkGAIgAygLMiIuY29ubm'
     'VjdC5DaGF0LlBhcnRpY2lwYW50c1VpZEVudHJ5Ug9wYXJ0aWNpcGFudHNVaWQSIQoMbGFzdF9t'
-    'ZXNzYWdlGAMgASgJUgtsYXN0TWVzc2FnZRIfCgtjaGF0X3NvdXJjZRgEIAEoCVIKY2hhdFNvdX'
-    'JjZRI5Chlpbml0aWF0ZWRfYnlfcGhvbmVfbnVtYmVyGAUgASgIUhZpbml0aWF0ZWRCeVBob25l'
-    'TnVtYmVyGkIKFFBhcnRpY2lwYW50c1VpZEVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbH'
-    'VlGAIgASgJUgV2YWx1ZToCOAE=');
+    'ZXNzYWdlGAMgASgJUgtsYXN0TWVzc2FnZRI0CgtjaGF0X3NvdXJjZRgEIAEoDjITLmNvbm5lY3'
+    'QuQ2hhdFNvdXJjZVIKY2hhdFNvdXJjZRI5Chlpbml0aWF0ZWRfYnlfcGhvbmVfbnVtYmVyGAUg'
+    'ASgIUhZpbml0aWF0ZWRCeVBob25lTnVtYmVyGkIKFFBhcnRpY2lwYW50c1VpZEVudHJ5EhAKA2'
+    'tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
 
 @$core.Deprecated('Use groupMetaDataDescriptor instead')
 const GroupMetaData$json = {
