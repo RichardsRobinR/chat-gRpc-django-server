@@ -120,6 +120,11 @@ class Message extends $pb.GeneratedMessage {
     $core.String? recipientRef,
     MessageStatus? status,
     $core.String? chatRoomRef,
+    $core.String? mediaUrl,
+    $core.int? timestamp,
+    $core.int? fileSize,
+    $core.String? localMediaPath,
+    $core.String? thumbnailPath,
   }) {
     final $result = create();
     if (id != null) {
@@ -140,6 +145,21 @@ class Message extends $pb.GeneratedMessage {
     if (chatRoomRef != null) {
       $result.chatRoomRef = chatRoomRef;
     }
+    if (mediaUrl != null) {
+      $result.mediaUrl = mediaUrl;
+    }
+    if (timestamp != null) {
+      $result.timestamp = timestamp;
+    }
+    if (fileSize != null) {
+      $result.fileSize = fileSize;
+    }
+    if (localMediaPath != null) {
+      $result.localMediaPath = localMediaPath;
+    }
+    if (thumbnailPath != null) {
+      $result.thumbnailPath = thumbnailPath;
+    }
     return $result;
   }
   Message._() : super();
@@ -151,8 +171,13 @@ class Message extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'senderRef')
     ..aOS(3, _omitFieldNames ? '' : 'content')
     ..aOS(4, _omitFieldNames ? '' : 'recipientRef')
-    ..e<MessageStatus>(5, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: MessageStatus.SENT, valueOf: MessageStatus.valueOf, enumValues: MessageStatus.values)
+    ..e<MessageStatus>(5, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: MessageStatus.SENDING, valueOf: MessageStatus.valueOf, enumValues: MessageStatus.values)
     ..aOS(6, _omitFieldNames ? '' : 'chatRoomRef')
+    ..aOS(7, _omitFieldNames ? '' : 'mediaUrl')
+    ..a<$core.int>(8, _omitFieldNames ? '' : 'timestamp', $pb.PbFieldType.O3)
+    ..a<$core.int>(9, _omitFieldNames ? '' : 'fileSize', $pb.PbFieldType.O3)
+    ..aOS(10, _omitFieldNames ? '' : 'localMediaPath')
+    ..aOS(11, _omitFieldNames ? '' : 'thumbnailPath')
     ..hasRequiredFields = false
   ;
 
@@ -230,6 +255,51 @@ class Message extends $pb.GeneratedMessage {
   $core.bool hasChatRoomRef() => $_has(5);
   @$pb.TagNumber(6)
   void clearChatRoomRef() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get mediaUrl => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set mediaUrl($core.String v) { $_setString(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasMediaUrl() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearMediaUrl() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.int get timestamp => $_getIZ(7);
+  @$pb.TagNumber(8)
+  set timestamp($core.int v) { $_setSignedInt32(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasTimestamp() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearTimestamp() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.int get fileSize => $_getIZ(8);
+  @$pb.TagNumber(9)
+  set fileSize($core.int v) { $_setSignedInt32(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasFileSize() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearFileSize() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get localMediaPath => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set localMediaPath($core.String v) { $_setString(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasLocalMediaPath() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearLocalMediaPath() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.String get thumbnailPath => $_getSZ(10);
+  @$pb.TagNumber(11)
+  set thumbnailPath($core.String v) { $_setString(10, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasThumbnailPath() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearThumbnailPath() => $_clearField(11);
 }
 
 class ChatResponse extends $pb.GeneratedMessage {
@@ -295,6 +365,7 @@ class Chat extends $pb.GeneratedMessage {
     ChatRequestStatus? chatRequestStatus,
     ChatSource? chatSource,
     $core.bool? initiatedByPhoneNumber,
+    MessageType? messageType,
   }) {
     final $result = create();
     if (id != null) {
@@ -324,6 +395,9 @@ class Chat extends $pb.GeneratedMessage {
     if (initiatedByPhoneNumber != null) {
       $result.initiatedByPhoneNumber = initiatedByPhoneNumber;
     }
+    if (messageType != null) {
+      $result.messageType = messageType;
+    }
     return $result;
   }
   Chat._() : super();
@@ -340,6 +414,7 @@ class Chat extends $pb.GeneratedMessage {
     ..e<ChatRequestStatus>(7, _omitFieldNames ? '' : 'chatRequestStatus', $pb.PbFieldType.OE, defaultOrMaker: ChatRequestStatus.PENDING, valueOf: ChatRequestStatus.valueOf, enumValues: ChatRequestStatus.values)
     ..e<ChatSource>(8, _omitFieldNames ? '' : 'chatSource', $pb.PbFieldType.OE, defaultOrMaker: ChatSource.PHONE_NUMBER, valueOf: ChatSource.valueOf, enumValues: ChatSource.values)
     ..aOB(9, _omitFieldNames ? '' : 'initiatedByPhoneNumber')
+    ..e<MessageType>(10, _omitFieldNames ? '' : 'messageType', $pb.PbFieldType.OE, defaultOrMaker: MessageType.text, valueOf: MessageType.valueOf, enumValues: MessageType.values)
     ..hasRequiredFields = false
   ;
 
@@ -426,6 +501,15 @@ class Chat extends $pb.GeneratedMessage {
   $core.bool hasInitiatedByPhoneNumber() => $_has(8);
   @$pb.TagNumber(9)
   void clearInitiatedByPhoneNumber() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  MessageType get messageType => $_getN(9);
+  @$pb.TagNumber(10)
+  set messageType(MessageType v) { $_setField(10, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasMessageType() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearMessageType() => $_clearField(10);
 }
 
 class GroupMetaData extends $pb.GeneratedMessage {

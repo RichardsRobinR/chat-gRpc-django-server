@@ -14,16 +14,18 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class MessageStatus extends $pb.ProtobufEnum {
-  static const MessageStatus SENT = MessageStatus._(0, _omitEnumNames ? '' : 'SENT');
-  static const MessageStatus DELIVERED = MessageStatus._(1, _omitEnumNames ? '' : 'DELIVERED');
-  static const MessageStatus READ = MessageStatus._(2, _omitEnumNames ? '' : 'READ');
-  static const MessageStatus ERROR = MessageStatus._(3, _omitEnumNames ? '' : 'ERROR');
+  static const MessageStatus SENDING = MessageStatus._(0, _omitEnumNames ? '' : 'SENDING');
+  static const MessageStatus SENT = MessageStatus._(1, _omitEnumNames ? '' : 'SENT');
+  static const MessageStatus DELIVERED = MessageStatus._(2, _omitEnumNames ? '' : 'DELIVERED');
+  static const MessageStatus READ = MessageStatus._(3, _omitEnumNames ? '' : 'READ');
+  static const MessageStatus FAILED = MessageStatus._(4, _omitEnumNames ? '' : 'FAILED');
 
   static const $core.List<MessageStatus> values = <MessageStatus> [
+    SENDING,
     SENT,
     DELIVERED,
     READ,
-    ERROR,
+    FAILED,
   ];
 
   static final $core.Map<$core.int, MessageStatus> _byValue = $pb.ProtobufEnum.initByValue(values);
@@ -62,6 +64,33 @@ class ChatRequestStatus extends $pb.ProtobufEnum {
   static ChatRequestStatus? valueOf($core.int value) => _byValue[value];
 
   const ChatRequestStatus._(super.v, super.n);
+}
+
+class MessageType extends $pb.ProtobufEnum {
+  static const MessageType text = MessageType._(0, _omitEnumNames ? '' : 'text');
+  static const MessageType image = MessageType._(1, _omitEnumNames ? '' : 'image');
+  static const MessageType video = MessageType._(2, _omitEnumNames ? '' : 'video');
+  static const MessageType audio = MessageType._(3, _omitEnumNames ? '' : 'audio');
+  static const MessageType file = MessageType._(4, _omitEnumNames ? '' : 'file');
+  static const MessageType document = MessageType._(5, _omitEnumNames ? '' : 'document');
+  static const MessageType story_reply = MessageType._(6, _omitEnumNames ? '' : 'story_reply');
+  static const MessageType other = MessageType._(7, _omitEnumNames ? '' : 'other');
+
+  static const $core.List<MessageType> values = <MessageType> [
+    text,
+    image,
+    video,
+    audio,
+    file,
+    document,
+    story_reply,
+    other,
+  ];
+
+  static final $core.Map<$core.int, MessageType> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static MessageType? valueOf($core.int value) => _byValue[value];
+
+  const MessageType._(super.v, super.n);
 }
 
 

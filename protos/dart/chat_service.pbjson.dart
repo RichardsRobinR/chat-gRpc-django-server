@@ -17,17 +17,18 @@ import 'dart:typed_data' as $typed_data;
 const MessageStatus$json = {
   '1': 'MessageStatus',
   '2': [
-    {'1': 'SENT', '2': 0},
-    {'1': 'DELIVERED', '2': 1},
-    {'1': 'READ', '2': 2},
-    {'1': 'ERROR', '2': 3},
+    {'1': 'SENDING', '2': 0},
+    {'1': 'SENT', '2': 1},
+    {'1': 'DELIVERED', '2': 2},
+    {'1': 'READ', '2': 3},
+    {'1': 'FAILED', '2': 4},
   ],
 };
 
 /// Descriptor for `MessageStatus`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List messageStatusDescriptor = $convert.base64Decode(
-    'Cg1NZXNzYWdlU3RhdHVzEggKBFNFTlQQABINCglERUxJVkVSRUQQARIICgRSRUFEEAISCQoFRV'
-    'JST1IQAw==');
+    'Cg1NZXNzYWdlU3RhdHVzEgsKB1NFTkRJTkcQABIICgRTRU5UEAESDQoJREVMSVZFUkVEEAISCA'
+    'oEUkVBRBADEgoKBkZBSUxFRBAE');
 
 @$core.Deprecated('Use chatSourceDescriptor instead')
 const ChatSource$json = {
@@ -57,6 +58,26 @@ final $typed_data.Uint8List chatRequestStatusDescriptor = $convert.base64Decode(
     'ChFDaGF0UmVxdWVzdFN0YXR1cxILCgdQRU5ESU5HEAASDAoIQUNDRVBURUQQARIMCghSRUpFQ1'
     'RFRBAC');
 
+@$core.Deprecated('Use messageTypeDescriptor instead')
+const MessageType$json = {
+  '1': 'MessageType',
+  '2': [
+    {'1': 'text', '2': 0},
+    {'1': 'image', '2': 1},
+    {'1': 'video', '2': 2},
+    {'1': 'audio', '2': 3},
+    {'1': 'file', '2': 4},
+    {'1': 'document', '2': 5},
+    {'1': 'story_reply', '2': 6},
+    {'1': 'other', '2': 7},
+  ],
+};
+
+/// Descriptor for `MessageType`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List messageTypeDescriptor = $convert.base64Decode(
+    'CgtNZXNzYWdlVHlwZRIICgR0ZXh0EAASCQoFaW1hZ2UQARIJCgV2aWRlbxACEgkKBWF1ZGlvEA'
+    'MSCAoEZmlsZRAEEgwKCGRvY3VtZW50EAUSDwoLc3RvcnlfcmVwbHkQBhIJCgVvdGhlchAH');
+
 @$core.Deprecated('Use getOrCreateChatRoomRequestDescriptor instead')
 const GetOrCreateChatRoomRequest$json = {
   '1': 'GetOrCreateChatRoomRequest',
@@ -85,6 +106,11 @@ const Message$json = {
     {'1': 'recipient_ref', '3': 4, '4': 1, '5': 9, '10': 'recipientRef'},
     {'1': 'status', '3': 5, '4': 1, '5': 14, '6': '.connect.MessageStatus', '10': 'status'},
     {'1': 'chat_room_ref', '3': 6, '4': 1, '5': 9, '10': 'chatRoomRef'},
+    {'1': 'media_url', '3': 7, '4': 1, '5': 9, '10': 'mediaUrl'},
+    {'1': 'timestamp', '3': 8, '4': 1, '5': 5, '10': 'timestamp'},
+    {'1': 'file_size', '3': 9, '4': 1, '5': 5, '10': 'fileSize'},
+    {'1': 'local_media_path', '3': 10, '4': 1, '5': 9, '10': 'localMediaPath'},
+    {'1': 'thumbnail_path', '3': 11, '4': 1, '5': 9, '10': 'thumbnailPath'},
   ],
 };
 
@@ -93,7 +119,10 @@ final $typed_data.Uint8List messageDescriptor = $convert.base64Decode(
     'CgdNZXNzYWdlEg4KAmlkGAEgASgJUgJpZBIdCgpzZW5kZXJfcmVmGAIgASgJUglzZW5kZXJSZW'
     'YSGAoHY29udGVudBgDIAEoCVIHY29udGVudBIjCg1yZWNpcGllbnRfcmVmGAQgASgJUgxyZWNp'
     'cGllbnRSZWYSLgoGc3RhdHVzGAUgASgOMhYuY29ubmVjdC5NZXNzYWdlU3RhdHVzUgZzdGF0dX'
-    'MSIgoNY2hhdF9yb29tX3JlZhgGIAEoCVILY2hhdFJvb21SZWY=');
+    'MSIgoNY2hhdF9yb29tX3JlZhgGIAEoCVILY2hhdFJvb21SZWYSGwoJbWVkaWFfdXJsGAcgASgJ'
+    'UghtZWRpYVVybBIcCgl0aW1lc3RhbXAYCCABKAVSCXRpbWVzdGFtcBIbCglmaWxlX3NpemUYCS'
+    'ABKAVSCGZpbGVTaXplEigKEGxvY2FsX21lZGlhX3BhdGgYCiABKAlSDmxvY2FsTWVkaWFQYXRo'
+    'EiUKDnRodW1ibmFpbF9wYXRoGAsgASgJUg10aHVtYm5haWxQYXRo');
 
 @$core.Deprecated('Use chatResponseDescriptor instead')
 const ChatResponse$json = {
@@ -120,6 +149,7 @@ const Chat$json = {
     {'1': 'chat_request_status', '3': 7, '4': 1, '5': 14, '6': '.connect.ChatRequestStatus', '10': 'chatRequestStatus'},
     {'1': 'chat_source', '3': 8, '4': 1, '5': 14, '6': '.connect.ChatSource', '10': 'chatSource'},
     {'1': 'initiated_by_phone_number', '3': 9, '4': 1, '5': 8, '10': 'initiatedByPhoneNumber'},
+    {'1': 'message_type', '3': 10, '4': 1, '5': 14, '6': '.connect.MessageType', '10': 'messageType'},
   ],
   '3': [Chat_ParticipantsUidEntry$json, Chat_LastReadTimeEntry$json, Chat_UnreadCountsEntry$json],
 };
@@ -165,10 +195,11 @@ final $typed_data.Uint8List chatDescriptor = $convert.base64Decode(
     'SgoTY2hhdF9yZXF1ZXN0X3N0YXR1cxgHIAEoDjIaLmNvbm5lY3QuQ2hhdFJlcXVlc3RTdGF0dX'
     'NSEWNoYXRSZXF1ZXN0U3RhdHVzEjQKC2NoYXRfc291cmNlGAggASgOMhMuY29ubmVjdC5DaGF0'
     'U291cmNlUgpjaGF0U291cmNlEjkKGWluaXRpYXRlZF9ieV9waG9uZV9udW1iZXIYCSABKAhSFm'
-    'luaXRpYXRlZEJ5UGhvbmVOdW1iZXIaQgoUUGFydGljaXBhbnRzVWlkRW50cnkSEAoDa2V5GAEg'
-    'ASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ARo/ChFMYXN0UmVhZFRpbWVFbnRyeR'
-    'IQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoBVIFdmFsdWU6AjgBGj8KEVVucmVhZENv'
-    'dW50c0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgFUgV2YWx1ZToCOAE=');
+    'luaXRpYXRlZEJ5UGhvbmVOdW1iZXISNwoMbWVzc2FnZV90eXBlGAogASgOMhQuY29ubmVjdC5N'
+    'ZXNzYWdlVHlwZVILbWVzc2FnZVR5cGUaQgoUUGFydGljaXBhbnRzVWlkRW50cnkSEAoDa2V5GA'
+    'EgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ARo/ChFMYXN0UmVhZFRpbWVFbnRy'
+    'eRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoBVIFdmFsdWU6AjgBGj8KEVVucmVhZE'
+    'NvdW50c0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgFUgV2YWx1ZToCOAE=');
 
 @$core.Deprecated('Use groupMetaDataDescriptor instead')
 const GroupMetaData$json = {
