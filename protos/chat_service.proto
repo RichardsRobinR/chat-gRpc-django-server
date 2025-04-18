@@ -2,7 +2,7 @@ syntax = "proto3";
 
 
 package connect;
-import "user_metadata.proto";
+import "user_service.proto";
 
 
 service ChatService {
@@ -26,7 +26,11 @@ message Message {
   string recipient_ref = 4;
   MessageStatus status = 5;
   string chat_room_ref = 6;
-
+  string media_url = 7; // URL of the media file
+  int32 timestamp = 8; // Timestamp of the message
+  int32 file_size = 9; // Size of the file in bytes
+  string local_media_path = 10; // Local path of the media file
+  string thumbnail_path = 11; // URL of the thumbnail image
 }
 
 message ChatResponse {
@@ -43,6 +47,7 @@ message Chat {
   ChatRequestStatus chat_request_status = 7;
   ChatSource chat_source = 8; 
   bool initiated_by_phone_number = 9;
+  MessageType message_type = 10; // text, image, video, audio, file, document, story_reply
 
   // repeated connect.User participants = 3;
   // string created_at = 4;
@@ -61,10 +66,11 @@ message GroupMetaData {
 }
 
 enum MessageStatus {
-  SENT = 0; // Message sent but not yet delivered
-  DELIVERED = 1; // Message delivered to recipient
-  READ = 2; // Message read by recipient
-  ERROR = 3; // Error in sending message
+  SENDING = 0; // Message is being sent
+  SENT = 1; // Message sent but not yet delivered
+  DELIVERED = 2; // Message delivered to recipient
+  READ = 3; // Message read by recipient
+  FAILED = 4; // Failed in sending message
 }
 
 enum ChatSource {
@@ -86,4 +92,15 @@ enum ChatRequestStatus {
   REJECTED = 2; // Chat is rejected
   // BLOCKED = 3; // Chat is blocked
   // UNBLOCKED = 4; // Chat is unblocked
+}
+
+enum MessageType {
+  text = 0;
+  image = 1;
+  video = 2;
+  audio = 3;
+  file = 4;
+  document = 5;
+  story_reply = 6;
+  other = 7;
 }

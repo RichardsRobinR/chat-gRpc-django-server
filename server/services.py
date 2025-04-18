@@ -4,8 +4,8 @@ from .serializers import UserMetaDataGRPCSerializer ,MessageGRPCSerializer, Chat
 import threading
 import queue
 import grpc
-from protos.python import user_metadata_pb2_grpc , user_metadata_pb2
-from protos.python import chat_metadata_pb2_grpc , chat_metadata_pb2
+from protos.python import user_service_pb2_grpc , user_service_pb2
+from protos.python import chat_service_pb2_grpc , chat_service_pb2
 from bson import ObjectId
 from mongoengine import ValidationError, NotUniqueError
 from .utils.mongo_utils import get_uuid_from_uid , generate_custom_Uuid , get_object_id_from_uid
@@ -13,7 +13,7 @@ import logging
 log = logging.getLogger(__name__)
 import time
 
-class UserService(user_metadata_pb2_grpc.UserServiceServicer):
+class UserService(user_service_pb2_grpc.UserServiceServicer):
     def GetUser(self, request, context):
         try:
             user = UserMetaDataModel.objects.get(uid=request.uid)
@@ -21,7 +21,7 @@ class UserService(user_metadata_pb2_grpc.UserServiceServicer):
         except UserMetaDataModel.DoesNotExist:
             context.set_code(5)  # NOT_FOUND
             context.set_details('User not found')
-            return user_metadata_pb2.UserResponse()
+            return user_service_pb2.UserResponse()
         
         print("omggg")
 
@@ -31,7 +31,7 @@ class UserService(user_metadata_pb2_grpc.UserServiceServicer):
 
         print("SERIALIZER DATA:", user_proto)
         print("okokokk")
-        return user_metadata_pb2.UserResponse(user=user_proto)
+        return user_service_pb2.UserResponse(user=user_proto)
     
     def CreateUser(self, request, context):
         # uid ,uuid,username , phonenumber ,( profile_picture_url -> optional)
@@ -93,17 +93,17 @@ class UserService(user_metadata_pb2_grpc.UserServiceServicer):
 
             user_proto = UserMetaDataGRPCSerializer.to_proto(new_user)
             log.info(f"CreatUser completed successfully:")
-            return user_metadata_pb2.UserResponse(user=user_proto)
+            return user_service_pb2.UserResponse(user=user_proto)
 
         except grpc.RpcError as e:
             log.error(f"gRPC Error in CreateUser: {e.code()}: {e.details()}")
             raise
             # context.set_code(grpc.StatusCode.INTERNAL)
             # context.set_details('Internal server error')
-            # return user_metadata_pb2.UserResponse()
+            # return user_service_pb2.UserResponse()
             
 
-class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
+class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 
     def __init__(self):
         self.connected_users = {}  # Maps username to queue 
@@ -174,6 +174,17 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
 
         with self.lock:
             recipient_ref = message.recipient_ref
+
+            # acknowledge message to the sender
+            if message.sender_ref in self.connected_users:
+                aacknowledge_message = chat_service_pb2.Message(
+                    sender="SERVER",
+                    content="SENT",
+                    recipient=message.sender_ref,
+                )
+                sender_queue.put(aacknowledge_message)
+
+
            
             if recipient_ref in self.connected_users:
                 self.connected_users[recipient_ref].put(message)
@@ -182,8 +193,13 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
                 # print("SENDER:", sender)
                 # print("RECIPIENT:", recipient)
+                # chat_source_value = request.chat_source
+                # chat_source_enum_name = chat_service_pb2.MessageStatus.
 
-                self._db_send_message(message, recipient_ref, status="DELIVERED")
+                msg = self._db_send_message(message, recipient_ref, status="DELIVERED")
+
+                # acknowledge message to the sender
+                
                 
             else:
                 # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
@@ -193,7 +209,7 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
 
                 self._db_send_message(message, recipient_ref, status="SENT")
 
-                # error_msg = chat_metadata_pb2.Message(
+                # error_msg = chat_service_pb2.Message(
                 #     message_id="0",
                 #     sender="Server",
                 #     content=f"User {recipient} is offline.",
@@ -215,6 +231,9 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             ).save()
             print("Message saved:", msg)
 
+
+            
+
             # msg.chat_room_ref.last_message = message.content
             # msg.chat_room_ref.last_message_sender_ref = message.sender_ref
             # msg.chat_room_ref.last_read_time[recipient] = int(time.time() * 1000)
@@ -232,6 +251,7 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             # chat.save()
             
             print("Chat room updated:", chat)
+            return msg
         except (ValidationError, NotUniqueError) as e:
             print("Failed to save message:", e)
 
@@ -243,7 +263,7 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             other_user_uid = request.other_user_uid
             current_user_phone_number = request.current_user_phone_number
             chat_source_value = request.chat_source
-            chat_source_enum_name = chat_metadata_pb2.ChatSource.Name(chat_source_value)
+            chat_source_enum_name = chat_service_pb2.ChatSource.Name(chat_source_value)
             print(f"CURRENT USER UID: {current_user_uid}")
             print("OTHER USER UID:", other_user_uid)
             print("CURRENT USER PHONE NUMBER:", current_user_phone_number)
@@ -315,12 +335,12 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             # Convert to protobuf message
             chat_proto = ChatMetaDataGRPCSerializer.to_proto(chat_room)
             print("Chat room protobuf:", chat_proto)
-            return chat_metadata_pb2.ChatResponse(chat=chat_proto)
+            return chat_service_pb2.ChatResponse(chat=chat_proto)
         except grpc.RpcError as e:
             print(f"Error in ChatRoom: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details('Internal server error')
-            # return chat_metadata_pb2.ChatResponse()
+            # return chat_service_pb2.ChatResponse()
             raise
         
     
@@ -339,18 +359,18 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             print("USER:", user)
             
             if user == None:
-                log.error("User not found")
+                log.info("User not found")
                 context.abort(grpc.StatusCode.NOT_FOUND, 'User not found')
 
             user_proto = UserMetaDataGRPCSerializer.to_proto(user)
 
             log.info("VerifyUuid finished")
-            return chat_metadata_pb2.VerifyUuidResponse(user=user_proto)
+            return chat_service_pb2.VerifyUuidResponse(user=user_proto)
         except grpc.RpcError as e:  
             print(f"Error in VerifyUuid: {e}")
             log.error(f"gRPC Error in VerifyUuid: {e.code()}: {e.details()}")
             raise
-            # return chat_metadata_pb2.VerifyUuidResponse(user=None)
+            # return chat_service_pb2.VerifyUuidResponse(user=None)
        
 
             

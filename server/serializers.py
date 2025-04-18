@@ -1,7 +1,7 @@
 from bson import ObjectId
 from .models import UserMetaDataModel ,MessageModel, ChatMetaDataModel
-from protos.python import user_metadata_pb2 
-from protos.python import chat_metadata_pb2
+from protos.python import user_service_pb2 
+from protos.python import chat_service_pb2
 
 
 class UserMetaDataGRPCSerializer:
@@ -29,7 +29,7 @@ class UserMetaDataGRPCSerializer:
             "is_active": user.is_active,
             "is_staff": user.is_staff,
         }
-        return user_metadata_pb2.User(**data)
+        return user_service_pb2.User(**data)
 
 
 class MessageGRPCSerializer:
@@ -43,7 +43,7 @@ class MessageGRPCSerializer:
             "chat_room_ref": str(msg.chat_room_ref),
             "status": msg.status,
         }
-        return chat_metadata_pb2.Message(**data)
+        return chat_service_pb2.Message(**data)
     
     
 
@@ -57,6 +57,6 @@ class ChatMetaDataGRPCSerializer:
             "chat_source": chat.chat_source,
             "initiated_by_phone_number": chat.initiated_by_phone_number,
         }
-        return chat_metadata_pb2.Chat(**data)
+        return chat_service_pb2.Chat(**data)
 
 #  {key: str(user.id) for key, user in participants_uid.items()}
