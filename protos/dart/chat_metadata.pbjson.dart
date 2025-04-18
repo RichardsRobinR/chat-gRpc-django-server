@@ -85,7 +85,7 @@ const Chat$json = {
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'participants_uid', '3': 2, '4': 3, '5': 11, '6': '.connect.Chat.ParticipantsUidEntry', '10': 'participantsUid'},
-    {'1': 'last_message', '3': 3, '4': 1, '5': 11, '6': '.connect.Message', '10': 'lastMessage'},
+    {'1': 'last_message', '3': 3, '4': 1, '5': 9, '10': 'lastMessage'},
     {'1': 'chat_source', '3': 4, '4': 1, '5': 9, '10': 'chatSource'},
     {'1': 'initiated_by_phone_number', '3': 5, '4': 1, '5': 8, '10': 'initiatedByPhoneNumber'},
   ],
@@ -105,11 +105,11 @@ const Chat_ParticipantsUidEntry$json = {
 /// Descriptor for `Chat`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List chatDescriptor = $convert.base64Decode(
     'CgRDaGF0Eg4KAmlkGAEgASgJUgJpZBJNChBwYXJ0aWNpcGFudHNfdWlkGAIgAygLMiIuY29ubm'
-    'VjdC5DaGF0LlBhcnRpY2lwYW50c1VpZEVudHJ5Ug9wYXJ0aWNpcGFudHNVaWQSMwoMbGFzdF9t'
-    'ZXNzYWdlGAMgASgLMhAuY29ubmVjdC5NZXNzYWdlUgtsYXN0TWVzc2FnZRIfCgtjaGF0X3NvdX'
-    'JjZRgEIAEoCVIKY2hhdFNvdXJjZRI5Chlpbml0aWF0ZWRfYnlfcGhvbmVfbnVtYmVyGAUgASgI'
-    'UhZpbml0aWF0ZWRCeVBob25lTnVtYmVyGkIKFFBhcnRpY2lwYW50c1VpZEVudHJ5EhAKA2tleR'
-    'gBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
+    'VjdC5DaGF0LlBhcnRpY2lwYW50c1VpZEVudHJ5Ug9wYXJ0aWNpcGFudHNVaWQSIQoMbGFzdF9t'
+    'ZXNzYWdlGAMgASgJUgtsYXN0TWVzc2FnZRIfCgtjaGF0X3NvdXJjZRgEIAEoCVIKY2hhdFNvdX'
+    'JjZRI5Chlpbml0aWF0ZWRfYnlfcGhvbmVfbnVtYmVyGAUgASgIUhZpbml0aWF0ZWRCeVBob25l'
+    'TnVtYmVyGkIKFFBhcnRpY2lwYW50c1VpZEVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbH'
+    'VlGAIgASgJUgV2YWx1ZToCOAE=');
 
 @$core.Deprecated('Use groupMetaDataDescriptor instead')
 const GroupMetaData$json = {
@@ -131,4 +131,29 @@ final $typed_data.Uint8List groupMetaDataDescriptor = $convert.base64Decode(
     'cmVhdGVkX2J5GAQgASgLMg0uY29ubmVjdC5Vc2VyUgljcmVhdGVkQnkSJQoGYWRtaW5zGAUgAy'
     'gLMg0uY29ubmVjdC5Vc2VyUgZhZG1pbnMSJwoPcHJvZmlsZV9waWN0dXJlGAYgASgJUg5wcm9m'
     'aWxlUGljdHVyZQ==');
+
+@$core.Deprecated('Use verifyUuidRequestDescriptor instead')
+const VerifyUuidRequest$json = {
+  '1': 'VerifyUuidRequest',
+  '2': [
+    {'1': 'uuid', '3': 1, '4': 1, '5': 9, '10': 'uuid'},
+  ],
+};
+
+/// Descriptor for `VerifyUuidRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List verifyUuidRequestDescriptor = $convert.base64Decode(
+    'ChFWZXJpZnlVdWlkUmVxdWVzdBISCgR1dWlkGAEgASgJUgR1dWlk');
+
+@$core.Deprecated('Use verifyUuidResponseDescriptor instead')
+const VerifyUuidResponse$json = {
+  '1': 'VerifyUuidResponse',
+  '2': [
+    {'1': 'user', '3': 1, '4': 1, '5': 11, '6': '.connect.User', '10': 'user'},
+  ],
+};
+
+/// Descriptor for `VerifyUuidResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List verifyUuidResponseDescriptor = $convert.base64Decode(
+    'ChJWZXJpZnlVdWlkUmVzcG9uc2USIQoEdXNlchgBIAEoCzINLmNvbm5lY3QuVXNlclIEdXNlcg'
+    '==');
 

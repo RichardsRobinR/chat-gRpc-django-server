@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import logging
+from django.conf import settings
+import os
+import logging.config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,3 +127,113 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# Define custom log levels
+SUCCESS = 25  # Between INFO and WARNING
+INFO_DATA = 15  # Between DEBUG and INFO
+
+# Register custom log levels
+logging.addLevelName(SUCCESS, 'SUCCESS')
+logging.addLevelName(INFO_DATA, 'DATA')
+
+# Add custom methods to Logger class
+def success(self, message, *args, **kwargs):
+    self.log(SUCCESS, message, *args, **kwargs)
+
+def info_data(self, message, *args, **kwargs):
+    self.log(INFO_DATA, message, *args, **kwargs)
+
+# Add methods to Logger class
+logging.Logger.success = success
+logging.Logger.info_data = info_data
+
+# Ensure logs directory exists
+logs_dir = os.path.join(BASE_DIR, 'logs')
+os.makedirs(logs_dir, exist_ok=True)
+
+# Enhanced logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s%(levelname)-8s%(reset)s %(bold_white)s[%(asctime)s]%(reset)s %(message)s',
+            'datefmt': '%H:%M:%S',
+            'log_colors': {
+                'DEBUG': 'cyan',
+                'DATA': 'bold_blue',
+                'INFO': 'green',
+                'SUCCESS': 'bold_green',
+                'WARNING': 'yellow',
+                'ERROR': 'bold_red',
+                'CRITICAL': 'bold_white,bg_red',
+            },
+            'secondary_log_colors': {
+                'message': {
+                    'ERROR': 'red',
+                    'CRITICAL': 'red',
+                    'SUCCESS': 'green'
+                }
+            }
+        },
+        'file': {
+            'format': '%(levelname)-8s %(asctime)s [%(name)s:%(lineno)d] | %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Changed from INFO to DEBUG to show all messages
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(logs_dir, 'debug.log'),
+            'maxBytes': 10 * 1024 * 1024,  # 10 MB
+            'backupCount': 5,
+            'formatter': 'file',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(logs_dir, 'error.log'),
+            'maxBytes': 10 * 1024 * 1024,  # 10 MB
+            'backupCount': 5,
+            'formatter': 'file',
+        }
+    },
+    'loggers': {
+        '': {  # root logger
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+         # MongoDB specific loggers - set to INFO level to hide DEBUG messages
+        'pymongo': {
+            'level': 'INFO',
+            'handlers': ['file'],
+            'propagate': False,
+        },
+        'mongoengine': {
+            'level': 'INFO',
+            'handlers': ['file'],
+            'propagate': False,
+        },
+        'motor': {
+            'level': 'INFO', 
+            'handlers': ['file'],
+            'propagate': False,
+        }
+    },
+}
+
+# Apply configuration
+logging.config.dictConfig(LOGGING)
+
+# Get logger
+log = logging.getLogger(__name__)

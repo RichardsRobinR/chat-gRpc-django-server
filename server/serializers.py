@@ -1,5 +1,5 @@
 from bson import ObjectId
-from .models import UserMetaDataModel ,MessageModel, ChatMetaDataModel, MessageModelEmbedded
+from .models import UserMetaDataModel ,MessageModel, ChatMetaDataModel
 from protos.python import user_metadata_pb2 
 from protos.python import chat_metadata_pb2
 
@@ -45,18 +45,6 @@ class MessageGRPCSerializer:
         }
         return chat_metadata_pb2.Message(**data)
     
-
-class MessageEmbeddedGRPCSerializer:
-    @staticmethod
-    def to_proto(msg: MessageModelEmbedded):
-        data = {
-            "sender_ref": str(msg.sender_ref),
-            "recipient_ref": str(msg.recipient_ref),
-            "content": msg.content,
-            "chat_room_ref": str(msg.chat_room_ref),
-            "status": msg.status,
-        }
-        return chat_metadata_pb2.Message(**data)
     
 
 class ChatMetaDataGRPCSerializer:
@@ -65,7 +53,7 @@ class ChatMetaDataGRPCSerializer:
         data = {
             "id": str(chat.id),
             "participants_uid": {key : str(value) for key,value in (chat.participants_uid or {}).items()},
-            "last_message": MessageEmbeddedGRPCSerializer.to_proto(chat.last_message) if chat.last_message else None,
+            "last_message": chat.last_message if chat.last_message else "",
             "chat_source": chat.chat_source,
             "initiated_by_phone_number": chat.initiated_by_phone_number,
         }

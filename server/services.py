@@ -9,7 +9,8 @@ from protos.python import chat_metadata_pb2_grpc , chat_metadata_pb2
 from bson import ObjectId
 from mongoengine import ValidationError, NotUniqueError
 from .utils.mongo_utils import get_uuid_from_uid , generate_custom_Uuid , get_object_id_from_uid
-
+import logging
+log = logging.getLogger(__name__)
 
 class UserService(user_metadata_pb2_grpc.UserServiceServicer):
     def GetUser(self, request, context):
@@ -144,7 +145,7 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
 
             chat = ChatMetaDataModel.objects.get(id=ObjectId(message.chat_room_ref))
 
-            chat.last_message = msg.to_embedded()
+            chat.last_message = msg.content
 
             chat.save()
             print("Message saved:", msg)
@@ -159,10 +160,13 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             other_user_uid = request.other_user_uid
             current_user_phone_number = request.current_user_phone_number
             chat_source = request.chat_source
-            print("CURRENT USER UID:", current_user_uid)
-            print("OTHER USER UID:", other_user_uid)
-            print("CURRENT USER PHONE NUMBER:", current_user_phone_number)
-            print("CHAT SOURCE:", chat_source)
+            log.debug(f"CURRENT USER UID: {current_user_uid}")
+            # log.debug("OTHER USER UID:", other_user_uid)
+            # log.debug("CURRENT USER PHONE NUMBER:", current_user_phone_number)
+            # log.debug("CHAT SOURCE:", chat_source)
+
+            log.debug("Harmless debug Message")
+            log.info("Info Message")
 
             if not current_user_uid or not other_user_uid:
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -213,7 +217,8 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                     id=ObjectId(room_id),
                     participants_uid= {current_user_uid : current_user_object_id, other_user_uid: other_user_object_id},
                     chat_source=chat_source,
-                    initiated_by_phone_number= current_user_phone_number
+                    initiated_by_phone_number= current_user_phone_number,
+                    last_message="",
                 )
                 chat_room.save()
                 print("Chat room created:", chat_room)
@@ -222,6 +227,8 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             print("type chat romm:", type(chat_room))
 
             print("chat room id",chat_room.id)
+            print("last message", chat_room.last_message)
+            
 
 
 
@@ -237,6 +244,28 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             return chat_metadata_pb2.ChatResponse()
         
     
+    def VerifyUuid(self, request, context):
+        log.info("VerifyUuid called")
+        try:
+            uuid = request.uuid
+            print("UUID:", uuid)
+            if len(uuid) != 6:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details('Invalid UUID length')
+                context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Invalid UUID length')
+
+            user_metadata = UserMetaDataModel.object(uuid=uuid).first()
+            print("USER METADATA:", user_metadata)
+            
+            if not user_metadata:
+                context.abort(grpc.StatusCode.NOT_FOUND, 'User not found')
+
+            log.info("VerifyUuid finished")
+            return chat_metadata_pb2.VerifyUuidResponse(uuid=uuid)
+        except Exception as e:
+            print(f"Error in VerifyUuid: {e}")
+            return chat_metadata_pb2.VerifyUuidResponse(uuid=None)
+       
 
             
             

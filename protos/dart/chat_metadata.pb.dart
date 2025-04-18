@@ -288,7 +288,7 @@ class Chat extends $pb.GeneratedMessage {
   factory Chat({
     $core.String? id,
     $pb.PbMap<$core.String, $core.String>? participantsUid,
-    Message? lastMessage,
+    $core.String? lastMessage,
     $core.String? chatSource,
     $core.bool? initiatedByPhoneNumber,
   }) {
@@ -317,7 +317,7 @@ class Chat extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Chat', package: const $pb.PackageName(_omitMessageNames ? '' : 'connect'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'participantsUid', entryClassName: 'Chat.ParticipantsUidEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('connect'))
-    ..aOM<Message>(3, _omitFieldNames ? '' : 'lastMessage', subBuilder: Message.create)
+    ..aOS(3, _omitFieldNames ? '' : 'lastMessage')
     ..aOS(4, _omitFieldNames ? '' : 'chatSource')
     ..aOB(5, _omitFieldNames ? '' : 'initiatedByPhoneNumber')
     ..hasRequiredFields = false
@@ -357,15 +357,13 @@ class Chat extends $pb.GeneratedMessage {
   $pb.PbMap<$core.String, $core.String> get participantsUid => $_getMap(1);
 
   @$pb.TagNumber(3)
-  Message get lastMessage => $_getN(2);
+  $core.String get lastMessage => $_getSZ(2);
   @$pb.TagNumber(3)
-  set lastMessage(Message v) { $_setField(3, v); }
+  set lastMessage($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasLastMessage() => $_has(2);
   @$pb.TagNumber(3)
   void clearLastMessage() => $_clearField(3);
-  @$pb.TagNumber(3)
-  Message ensureLastMessage() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.String get chatSource => $_getSZ(3);
@@ -500,6 +498,108 @@ class GroupMetaData extends $pb.GeneratedMessage {
   $core.bool hasProfilePicture() => $_has(5);
   @$pb.TagNumber(6)
   void clearProfilePicture() => $_clearField(6);
+}
+
+class VerifyUuidRequest extends $pb.GeneratedMessage {
+  factory VerifyUuidRequest({
+    $core.String? uuid,
+  }) {
+    final $result = create();
+    if (uuid != null) {
+      $result.uuid = uuid;
+    }
+    return $result;
+  }
+  VerifyUuidRequest._() : super();
+  factory VerifyUuidRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory VerifyUuidRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'VerifyUuidRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'connect'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'uuid')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  VerifyUuidRequest clone() => VerifyUuidRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  VerifyUuidRequest copyWith(void Function(VerifyUuidRequest) updates) => super.copyWith((message) => updates(message as VerifyUuidRequest)) as VerifyUuidRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static VerifyUuidRequest create() => VerifyUuidRequest._();
+  VerifyUuidRequest createEmptyInstance() => create();
+  static $pb.PbList<VerifyUuidRequest> createRepeated() => $pb.PbList<VerifyUuidRequest>();
+  @$core.pragma('dart2js:noInline')
+  static VerifyUuidRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<VerifyUuidRequest>(create);
+  static VerifyUuidRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get uuid => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set uuid($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUuid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUuid() => $_clearField(1);
+}
+
+class VerifyUuidResponse extends $pb.GeneratedMessage {
+  factory VerifyUuidResponse({
+    $0.User? user,
+  }) {
+    final $result = create();
+    if (user != null) {
+      $result.user = user;
+    }
+    return $result;
+  }
+  VerifyUuidResponse._() : super();
+  factory VerifyUuidResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory VerifyUuidResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'VerifyUuidResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'connect'), createEmptyInstance: create)
+    ..aOM<$0.User>(1, _omitFieldNames ? '' : 'user', subBuilder: $0.User.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  VerifyUuidResponse clone() => VerifyUuidResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  VerifyUuidResponse copyWith(void Function(VerifyUuidResponse) updates) => super.copyWith((message) => updates(message as VerifyUuidResponse)) as VerifyUuidResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static VerifyUuidResponse create() => VerifyUuidResponse._();
+  VerifyUuidResponse createEmptyInstance() => create();
+  static $pb.PbList<VerifyUuidResponse> createRepeated() => $pb.PbList<VerifyUuidResponse>();
+  @$core.pragma('dart2js:noInline')
+  static VerifyUuidResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<VerifyUuidResponse>(create);
+  static VerifyUuidResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $0.User get user => $_getN(0);
+  @$pb.TagNumber(1)
+  set user($0.User v) { $_setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUser() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUser() => $_clearField(1);
+  @$pb.TagNumber(1)
+  $0.User ensureUser() => $_ensure(0);
 }
 
 

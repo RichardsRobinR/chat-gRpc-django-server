@@ -29,6 +29,10 @@ class ChatServiceClient extends $grpc.Client {
       '/connect.ChatService/ChatRoom',
       ($1.GetOrCreateChatRoomRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.ChatResponse.fromBuffer(value));
+  static final _$verifyUuid = $grpc.ClientMethod<$1.VerifyUuidRequest, $1.VerifyUuidResponse>(
+      '/connect.ChatService/VerifyUuid',
+      ($1.VerifyUuidRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.VerifyUuidResponse.fromBuffer(value));
 
   ChatServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -42,6 +46,10 @@ class ChatServiceClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$1.ChatResponse> chatRoom($1.GetOrCreateChatRoomRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$chatRoom, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$1.VerifyUuidResponse> verifyUuid($1.VerifyUuidRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$verifyUuid, request, options: options);
   }
 }
 
@@ -64,12 +72,24 @@ abstract class ChatServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $1.GetOrCreateChatRoomRequest.fromBuffer(value),
         ($1.ChatResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.VerifyUuidRequest, $1.VerifyUuidResponse>(
+        'VerifyUuid',
+        verifyUuid_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.VerifyUuidRequest.fromBuffer(value),
+        ($1.VerifyUuidResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$1.ChatResponse> chatRoom_Pre($grpc.ServiceCall $call, $async.Future<$1.GetOrCreateChatRoomRequest> $request) async {
     return chatRoom($call, await $request);
   }
 
+  $async.Future<$1.VerifyUuidResponse> verifyUuid_Pre($grpc.ServiceCall $call, $async.Future<$1.VerifyUuidRequest> $request) async {
+    return verifyUuid($call, await $request);
+  }
+
   $async.Stream<$1.Message> messageStream($grpc.ServiceCall call, $async.Stream<$1.Message> request);
   $async.Future<$1.ChatResponse> chatRoom($grpc.ServiceCall call, $1.GetOrCreateChatRoomRequest request);
+  $async.Future<$1.VerifyUuidResponse> verifyUuid($grpc.ServiceCall call, $1.VerifyUuidRequest request);
 }
