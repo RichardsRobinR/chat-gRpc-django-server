@@ -37,10 +37,12 @@ message Chat {
   string id = 1;
   map<string, string> participants_uid = 2;
   string last_message = 3;
-  ChatSource chat_source = 4; 
-  bool initiated_by_phone_number = 5;
-
-
+  string last_message_sender_ref = 4;
+  map<string, int32> last_read_time = 5;
+  map<string, int32> unread_counts = 6;
+  ChatRequestStatus chat_request_status = 7;
+  ChatSource chat_source = 8; 
+  bool initiated_by_phone_number = 9;
 
   // repeated connect.User participants = 3;
   // string created_at = 4;
@@ -76,4 +78,12 @@ message VerifyUuidRequest {
 
 message VerifyUuidResponse {
   User user = 1;
+}
+
+enum ChatRequestStatus {
+  PENDING = 0; // Chat is pending
+  ACCEPTED = 1; // Chat is accepted
+  REJECTED = 2; // Chat is rejected
+  // BLOCKED = 3; // Chat is blocked
+  // UNBLOCKED = 4; // Chat is unblocked
 }

@@ -47,5 +47,22 @@ class ChatSource extends $pb.ProtobufEnum {
   const ChatSource._(super.v, super.n);
 }
 
+class ChatRequestStatus extends $pb.ProtobufEnum {
+  static const ChatRequestStatus PENDING = ChatRequestStatus._(0, _omitEnumNames ? '' : 'PENDING');
+  static const ChatRequestStatus ACCEPTED = ChatRequestStatus._(1, _omitEnumNames ? '' : 'ACCEPTED');
+  static const ChatRequestStatus REJECTED = ChatRequestStatus._(2, _omitEnumNames ? '' : 'REJECTED');
+
+  static const $core.List<ChatRequestStatus> values = <ChatRequestStatus> [
+    PENDING,
+    ACCEPTED,
+    REJECTED,
+  ];
+
+  static final $core.Map<$core.int, ChatRequestStatus> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static ChatRequestStatus? valueOf($core.int value) => _byValue[value];
+
+  const ChatRequestStatus._(super.v, super.n);
+}
+
 
 const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

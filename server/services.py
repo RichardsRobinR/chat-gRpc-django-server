@@ -143,8 +143,9 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 except Exception as e:
                     print(f"Error processing messages: {e}")
 
-            message_thread = threading.Thread(target=process_messages, daemon=True)
-            message_thread.start()
+            if threading.main_thread().is_alive():
+                message_thread = threading.Thread(target=process_messages, daemon=True)
+                message_thread.start()
 
             # Yield messages from queue
             while True:
@@ -212,14 +213,25 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                 status=status,
                 chat_room_ref = ObjectId(message.chat_room_ref),
             ).save()
-
-            chat = ChatMetaDataModel.objects.get(id=ObjectId(message.chat_room_ref))
-
-            chat.last_message = msg.content
-
-            chat.save()
             print("Message saved:", msg)
-            print("Message saved with ID:", msg.id)
+
+            # msg.chat_room_ref.last_message = message.content
+            # msg.chat_room_ref.last_message_sender_ref = message.sender_ref
+            # msg.chat_room_ref.last_read_time[recipient] = int(time.time() * 1000)
+            # TODO: leave me alone
+            chat = msg.chat_room_ref.update(
+                set__last_message=message.content,
+                set__last_message_sender_ref= ObjectId(message.sender_ref),
+                set__last_read_time={str(message.sender_ref): int(time.time() * 1000)},
+            )
+
+            # chat = ChatMetaDataModel.objects.get(id=ObjectId(message.chat_room_ref))
+
+            # chat.last_message = msg.content
+
+            # chat.save()
+            
+            print("Chat room updated:", chat)
         except (ValidationError, NotUniqueError) as e:
             print("Failed to save message:", e)
 
@@ -251,7 +263,8 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
             
             if not current_user_phone_number:
                 context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Phone number is required')
-            
+
+
             
             current_user_object_id = get_object_id_from_uid(current_user_uid)
             other_user_object_id = get_object_id_from_uid(other_user_uid)
@@ -284,8 +297,12 @@ class ChatService(chat_metadata_pb2_grpc.ChatServiceServicer):
                     id=ObjectId(room_id),
                     participants_uid= {current_user_uid : current_user_object_id, other_user_uid: other_user_object_id},
                     chat_source=  chat_source_enum_name ,
-                    initiated_by_phone_number= current_user_phone_number,
-                    last_message="",
+                    initiated_by_phone_number=  True if  chat_source_enum_name == "PHONE_NUMBER" else False,
+                    # last_message="",
+                    # last_message_sender_ref=None,
+                    # last_read_time={current_user_uid: int(time.time() * 1000)},
+                    # unread_counts={current_user_uid: 0, other_user_uid: 0},
+                    # chat_request_status= "PENDING",
                 )
                 chat_room.save()
                 print("Chat room created:", chat_room)

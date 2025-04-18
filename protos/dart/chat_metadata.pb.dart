@@ -289,6 +289,10 @@ class Chat extends $pb.GeneratedMessage {
     $core.String? id,
     $pb.PbMap<$core.String, $core.String>? participantsUid,
     $core.String? lastMessage,
+    $core.String? lastMessageSenderRef,
+    $pb.PbMap<$core.String, $core.int>? lastReadTime,
+    $pb.PbMap<$core.String, $core.int>? unreadCounts,
+    ChatRequestStatus? chatRequestStatus,
     ChatSource? chatSource,
     $core.bool? initiatedByPhoneNumber,
   }) {
@@ -301,6 +305,18 @@ class Chat extends $pb.GeneratedMessage {
     }
     if (lastMessage != null) {
       $result.lastMessage = lastMessage;
+    }
+    if (lastMessageSenderRef != null) {
+      $result.lastMessageSenderRef = lastMessageSenderRef;
+    }
+    if (lastReadTime != null) {
+      $result.lastReadTime.addAll(lastReadTime);
+    }
+    if (unreadCounts != null) {
+      $result.unreadCounts.addAll(unreadCounts);
+    }
+    if (chatRequestStatus != null) {
+      $result.chatRequestStatus = chatRequestStatus;
     }
     if (chatSource != null) {
       $result.chatSource = chatSource;
@@ -318,8 +334,12 @@ class Chat extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'participantsUid', entryClassName: 'Chat.ParticipantsUidEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('connect'))
     ..aOS(3, _omitFieldNames ? '' : 'lastMessage')
-    ..e<ChatSource>(4, _omitFieldNames ? '' : 'chatSource', $pb.PbFieldType.OE, defaultOrMaker: ChatSource.PHONE_NUMBER, valueOf: ChatSource.valueOf, enumValues: ChatSource.values)
-    ..aOB(5, _omitFieldNames ? '' : 'initiatedByPhoneNumber')
+    ..aOS(4, _omitFieldNames ? '' : 'lastMessageSenderRef')
+    ..m<$core.String, $core.int>(5, _omitFieldNames ? '' : 'lastReadTime', entryClassName: 'Chat.LastReadTimeEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.O3, packageName: const $pb.PackageName('connect'))
+    ..m<$core.String, $core.int>(6, _omitFieldNames ? '' : 'unreadCounts', entryClassName: 'Chat.UnreadCountsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.O3, packageName: const $pb.PackageName('connect'))
+    ..e<ChatRequestStatus>(7, _omitFieldNames ? '' : 'chatRequestStatus', $pb.PbFieldType.OE, defaultOrMaker: ChatRequestStatus.PENDING, valueOf: ChatRequestStatus.valueOf, enumValues: ChatRequestStatus.values)
+    ..e<ChatSource>(8, _omitFieldNames ? '' : 'chatSource', $pb.PbFieldType.OE, defaultOrMaker: ChatSource.PHONE_NUMBER, valueOf: ChatSource.valueOf, enumValues: ChatSource.values)
+    ..aOB(9, _omitFieldNames ? '' : 'initiatedByPhoneNumber')
     ..hasRequiredFields = false
   ;
 
@@ -366,22 +386,46 @@ class Chat extends $pb.GeneratedMessage {
   void clearLastMessage() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  ChatSource get chatSource => $_getN(3);
+  $core.String get lastMessageSenderRef => $_getSZ(3);
   @$pb.TagNumber(4)
-  set chatSource(ChatSource v) { $_setField(4, v); }
+  set lastMessageSenderRef($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasChatSource() => $_has(3);
+  $core.bool hasLastMessageSenderRef() => $_has(3);
   @$pb.TagNumber(4)
-  void clearChatSource() => $_clearField(4);
+  void clearLastMessageSenderRef() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $core.bool get initiatedByPhoneNumber => $_getBF(4);
-  @$pb.TagNumber(5)
-  set initiatedByPhoneNumber($core.bool v) { $_setBool(4, v); }
-  @$pb.TagNumber(5)
-  $core.bool hasInitiatedByPhoneNumber() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearInitiatedByPhoneNumber() => $_clearField(5);
+  $pb.PbMap<$core.String, $core.int> get lastReadTime => $_getMap(4);
+
+  @$pb.TagNumber(6)
+  $pb.PbMap<$core.String, $core.int> get unreadCounts => $_getMap(5);
+
+  @$pb.TagNumber(7)
+  ChatRequestStatus get chatRequestStatus => $_getN(6);
+  @$pb.TagNumber(7)
+  set chatRequestStatus(ChatRequestStatus v) { $_setField(7, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasChatRequestStatus() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearChatRequestStatus() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  ChatSource get chatSource => $_getN(7);
+  @$pb.TagNumber(8)
+  set chatSource(ChatSource v) { $_setField(8, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasChatSource() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearChatSource() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get initiatedByPhoneNumber => $_getBF(8);
+  @$pb.TagNumber(9)
+  set initiatedByPhoneNumber($core.bool v) { $_setBool(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasInitiatedByPhoneNumber() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearInitiatedByPhoneNumber() => $_clearField(9);
 }
 
 class GroupMetaData extends $pb.GeneratedMessage {

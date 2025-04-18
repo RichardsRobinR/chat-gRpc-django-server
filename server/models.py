@@ -57,7 +57,14 @@ class ChatMetaDataModel(me.Document):
     
     # participants_uid = me.ListField(me.ReferenceField(''))  # Array of User references
     participants_uid  = me.DictField()  # Dictionary of User references
-    last_message = me.StringField(max_length=20)  # Reference to the most recent message
+    last_message = me.StringField(max_length=20,default=None,null=True)  # Reference to the most recent message
+    last_message_sender_ref = me.ReferenceField('UserMetaDataModel',default=None,null=True)  # ref of the last message sender
+    last_read_time = me.DictField()  # uid -> last read timestamp
+    unread_counts = me.MapField(field=me.IntField(),default=None,null=True)  # uid -> count
+    chat_request_status = me.StringField(max_length=20,default=None,null=True)  # e.g., 'pending', 'accepted', 'declined'
+
+    # typing_user_ids = me.ListField(me.StringField())  # UIDs of users typing
+
     chat_source = me.StringField(max_length=20)  # e.g., 'phonenumber'
     initiated_by_phone_number = me.BooleanField(default=False)  # True if the chat was initiated by a phone number
     

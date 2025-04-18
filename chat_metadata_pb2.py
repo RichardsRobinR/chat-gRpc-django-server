@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 import user_metadata_pb2 as user__metadata__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x63hat_metadata.proto\x12\x07\x63onnect\x1a\x13user_metadata.proto\"\x9b\x01\n\x1aGetOrCreateChatRoomRequest\x12\x18\n\x10\x63urrent_user_uid\x18\x01 \x01(\t\x12\x16\n\x0eother_user_uid\x18\x02 \x01(\t\x12!\n\x19\x63urrent_user_phone_number\x18\x03 \x01(\t\x12(\n\x0b\x63hat_source\x18\x04 \x01(\x0e\x32\x13.connect.ChatSource\"\x90\x01\n\x07Message\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nsender_ref\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x15\n\rrecipient_ref\x18\x04 \x01(\t\x12&\n\x06status\x18\x05 \x01(\x0e\x32\x16.connect.MessageStatus\x12\x15\n\rchat_room_ref\x18\x06 \x01(\t\"+\n\x0c\x43hatResponse\x12\x1b\n\x04\x63hat\x18\x01 \x01(\x0b\x32\r.connect.Chat\"\xeb\x01\n\x04\x43hat\x12\n\n\x02id\x18\x01 \x01(\t\x12<\n\x10participants_uid\x18\x02 \x03(\x0b\x32\".connect.Chat.ParticipantsUidEntry\x12\x14\n\x0clast_message\x18\x03 \x01(\t\x12(\n\x0b\x63hat_source\x18\x04 \x01(\x0e\x32\x13.connect.ChatSource\x12!\n\x19initiated_by_phone_number\x18\x05 \x01(\x08\x1a\x36\n\x14ParticipantsUidEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xa4\x01\n\rGroupMetaData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\rcreation_date\x18\x03 \x01(\t\x12!\n\ncreated_by\x18\x04 \x01(\x0b\x32\r.connect.User\x12\x1d\n\x06\x61\x64mins\x18\x05 \x03(\x0b\x32\r.connect.User\x12\x17\n\x0fprofile_picture\x18\x06 \x01(\t\"!\n\x11VerifyUuidRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\"1\n\x12VerifyUuidResponse\x12\x1b\n\x04user\x18\x01 \x01(\x0b\x32\r.connect.User*=\n\rMessageStatus\x12\x08\n\x04SENT\x10\x00\x12\r\n\tDELIVERED\x10\x01\x12\x08\n\x04READ\x10\x02\x12\t\n\x05\x45RROR\x10\x03*(\n\nChatSource\x12\x10\n\x0cPHONE_NUMBER\x10\x00\x12\x08\n\x04UUID\x10\x01\x32\xd5\x01\n\x0b\x43hatService\x12\x37\n\rMessageStream\x12\x10.connect.Message\x1a\x10.connect.Message(\x01\x30\x01\x12\x46\n\x08\x43hatRoom\x12#.connect.GetOrCreateChatRoomRequest\x1a\x15.connect.ChatResponse\x12\x45\n\nVerifyUuid\x12\x1a.connect.VerifyUuidRequest\x1a\x1b.connect.VerifyUuidResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x63hat_metadata.proto\x12\x07\x63onnect\x1a\x13user_metadata.proto\"\x9b\x01\n\x1aGetOrCreateChatRoomRequest\x12\x18\n\x10\x63urrent_user_uid\x18\x01 \x01(\t\x12\x16\n\x0eother_user_uid\x18\x02 \x01(\t\x12!\n\x19\x63urrent_user_phone_number\x18\x03 \x01(\t\x12(\n\x0b\x63hat_source\x18\x04 \x01(\x0e\x32\x13.connect.ChatSource\"\x90\x01\n\x07Message\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nsender_ref\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12\x15\n\rrecipient_ref\x18\x04 \x01(\t\x12&\n\x06status\x18\x05 \x01(\x0e\x32\x16.connect.MessageStatus\x12\x15\n\rchat_room_ref\x18\x06 \x01(\t\"+\n\x0c\x43hatResponse\x12\x1b\n\x04\x63hat\x18\x01 \x01(\x0b\x32\r.connect.Chat\"\xa0\x04\n\x04\x43hat\x12\n\n\x02id\x18\x01 \x01(\t\x12<\n\x10participants_uid\x18\x02 \x03(\x0b\x32\".connect.Chat.ParticipantsUidEntry\x12\x14\n\x0clast_message\x18\x03 \x01(\t\x12\x1f\n\x17last_message_sender_ref\x18\x04 \x01(\t\x12\x37\n\x0elast_read_time\x18\x05 \x03(\x0b\x32\x1f.connect.Chat.LastReadTimeEntry\x12\x36\n\runread_counts\x18\x06 \x03(\x0b\x32\x1f.connect.Chat.UnreadCountsEntry\x12\x37\n\x13\x63hat_request_status\x18\x07 \x01(\x0e\x32\x1a.connect.ChatRequestStatus\x12(\n\x0b\x63hat_source\x18\x08 \x01(\x0e\x32\x13.connect.ChatSource\x12!\n\x19initiated_by_phone_number\x18\t \x01(\x08\x1a\x36\n\x14ParticipantsUidEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x33\n\x11LastReadTimeEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\x1a\x33\n\x11UnreadCountsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\xa4\x01\n\rGroupMetaData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x15\n\rcreation_date\x18\x03 \x01(\t\x12!\n\ncreated_by\x18\x04 \x01(\x0b\x32\r.connect.User\x12\x1d\n\x06\x61\x64mins\x18\x05 \x03(\x0b\x32\r.connect.User\x12\x17\n\x0fprofile_picture\x18\x06 \x01(\t\"!\n\x11VerifyUuidRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\"1\n\x12VerifyUuidResponse\x12\x1b\n\x04user\x18\x01 \x01(\x0b\x32\r.connect.User*=\n\rMessageStatus\x12\x08\n\x04SENT\x10\x00\x12\r\n\tDELIVERED\x10\x01\x12\x08\n\x04READ\x10\x02\x12\t\n\x05\x45RROR\x10\x03*(\n\nChatSource\x12\x10\n\x0cPHONE_NUMBER\x10\x00\x12\x08\n\x04UUID\x10\x01*<\n\x11\x43hatRequestStatus\x12\x0b\n\x07PENDING\x10\x00\x12\x0c\n\x08\x41\x43\x43\x45PTED\x10\x01\x12\x0c\n\x08REJECTED\x10\x02\x32\xd5\x01\n\x0b\x43hatService\x12\x37\n\rMessageStream\x12\x10.connect.Message\x1a\x10.connect.Message(\x01\x30\x01\x12\x46\n\x08\x43hatRoom\x12#.connect.GetOrCreateChatRoomRequest\x1a\x15.connect.ChatResponse\x12\x45\n\nVerifyUuid\x12\x1a.connect.VerifyUuidRequest\x1a\x1b.connect.VerifyUuidResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,10 +34,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_CHAT_PARTICIPANTSUIDENTRY']._loaded_options = None
   _globals['_CHAT_PARTICIPANTSUIDENTRY']._serialized_options = b'8\001'
-  _globals['_MESSAGESTATUS']._serialized_start=894
-  _globals['_MESSAGESTATUS']._serialized_end=955
-  _globals['_CHATSOURCE']._serialized_start=957
-  _globals['_CHATSOURCE']._serialized_end=997
+  _globals['_CHAT_LASTREADTIMEENTRY']._loaded_options = None
+  _globals['_CHAT_LASTREADTIMEENTRY']._serialized_options = b'8\001'
+  _globals['_CHAT_UNREADCOUNTSENTRY']._loaded_options = None
+  _globals['_CHAT_UNREADCOUNTSENTRY']._serialized_options = b'8\001'
+  _globals['_MESSAGESTATUS']._serialized_start=1203
+  _globals['_MESSAGESTATUS']._serialized_end=1264
+  _globals['_CHATSOURCE']._serialized_start=1266
+  _globals['_CHATSOURCE']._serialized_end=1306
+  _globals['_CHATREQUESTSTATUS']._serialized_start=1308
+  _globals['_CHATREQUESTSTATUS']._serialized_end=1368
   _globals['_GETORCREATECHATROOMREQUEST']._serialized_start=54
   _globals['_GETORCREATECHATROOMREQUEST']._serialized_end=209
   _globals['_MESSAGE']._serialized_start=212
@@ -45,15 +51,19 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CHATRESPONSE']._serialized_start=358
   _globals['_CHATRESPONSE']._serialized_end=401
   _globals['_CHAT']._serialized_start=404
-  _globals['_CHAT']._serialized_end=639
-  _globals['_CHAT_PARTICIPANTSUIDENTRY']._serialized_start=585
-  _globals['_CHAT_PARTICIPANTSUIDENTRY']._serialized_end=639
-  _globals['_GROUPMETADATA']._serialized_start=642
-  _globals['_GROUPMETADATA']._serialized_end=806
-  _globals['_VERIFYUUIDREQUEST']._serialized_start=808
-  _globals['_VERIFYUUIDREQUEST']._serialized_end=841
-  _globals['_VERIFYUUIDRESPONSE']._serialized_start=843
-  _globals['_VERIFYUUIDRESPONSE']._serialized_end=892
-  _globals['_CHATSERVICE']._serialized_start=1000
-  _globals['_CHATSERVICE']._serialized_end=1213
+  _globals['_CHAT']._serialized_end=948
+  _globals['_CHAT_PARTICIPANTSUIDENTRY']._serialized_start=788
+  _globals['_CHAT_PARTICIPANTSUIDENTRY']._serialized_end=842
+  _globals['_CHAT_LASTREADTIMEENTRY']._serialized_start=844
+  _globals['_CHAT_LASTREADTIMEENTRY']._serialized_end=895
+  _globals['_CHAT_UNREADCOUNTSENTRY']._serialized_start=897
+  _globals['_CHAT_UNREADCOUNTSENTRY']._serialized_end=948
+  _globals['_GROUPMETADATA']._serialized_start=951
+  _globals['_GROUPMETADATA']._serialized_end=1115
+  _globals['_VERIFYUUIDREQUEST']._serialized_start=1117
+  _globals['_VERIFYUUIDREQUEST']._serialized_end=1150
+  _globals['_VERIFYUUIDRESPONSE']._serialized_start=1152
+  _globals['_VERIFYUUIDRESPONSE']._serialized_end=1201
+  _globals['_CHATSERVICE']._serialized_start=1371
+  _globals['_CHATSERVICE']._serialized_end=1584
 # @@protoc_insertion_point(module_scope)
