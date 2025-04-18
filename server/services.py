@@ -19,18 +19,14 @@ class UserService(user_service_pb2_grpc.UserServiceServicer):
             user = UserMetaDataModel.objects.get(uid=request.uid)
             print("USER:", user)
         except UserMetaDataModel.DoesNotExist:
-            context.set_code(5)  # NOT_FOUND
-            context.set_details('User not found')
-            return user_service_pb2.UserResponse()
+            context.abort(grpc.StatusCode.NOT_FOUND, 'User not found')
         
-        print("omggg")
-
         print("type USER:", type(user))
 
         user_proto = UserMetaDataGRPCSerializer.to_proto(user)
 
-        print("SERIALIZER DATA:", user_proto)
-        print("okokokk")
+        print("SERIALIZER DATA ID:", user_proto)
+
         return user_service_pb2.UserResponse(user=user_proto)
     
     def CreateUser(self, request, context):
@@ -111,9 +107,12 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 
     def MessageStream(self, request_iterator, context):
         """Handle bidirectional chat stream with improved error handling"""
+        
         try:
+
             # Get first message to identify sender and initialize queue
             first_message = next(request_iterator)
+            log.info("MessageStream called")
             sender = first_message.sender_ref
             print("SENDER:", sender)
             print("FIRST MESSAGE:", first_message.sender_ref)
@@ -176,13 +175,13 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
             recipient_ref = message.recipient_ref
 
             # acknowledge message to the sender
-            if message.sender_ref in self.connected_users:
-                aacknowledge_message = chat_service_pb2.Message(
-                    sender="SERVER",
-                    content="SENT",
-                    recipient=message.sender_ref,
-                )
-                sender_queue.put(aacknowledge_message)
+            # if message.sender_ref in self.connected_users:
+            #     aacknowledge_message = chat_service_pb2.Message(
+            #         sender="SERVER",
+            #         content="SENT",
+            #         recipient=message.sender_ref,
+            #     )
+            #     sender_queue.put(aacknowledge_message)
 
 
            
