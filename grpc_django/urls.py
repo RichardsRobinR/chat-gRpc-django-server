@@ -27,5 +27,5 @@ urlpatterns = [
 
 def grpc_handlers(server):
     user_service_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
-    # chat_service_pb2_grpc.add_ChatServiceServicer_to_server(ChatService(), server)
     chat_service_pb2_grpc.add_ChatServiceServicer_to_server(ChatService(), server)
+    # chat_service_pb2_grpc.add_ChatServiceServicer_to_server(ChatService(), server)

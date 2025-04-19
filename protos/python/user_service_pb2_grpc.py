@@ -3,6 +3,7 @@
 import grpc
 import warnings
 
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 import user_service_pb2 as user__service__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
@@ -41,7 +42,7 @@ class UserServiceStub(object):
                 _registered_method=True)
         self.CreateUser = channel.unary_unary(
                 '/connect.UserService/CreateUser',
-                request_serializer=user__service__pb2.CreateUserRequest.SerializeToString,
+                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=user__service__pb2.UserResponse.FromString,
                 _registered_method=True)
         self.ListUsers = channel.unary_stream(
@@ -82,7 +83,7 @@ def add_UserServiceServicer_to_server(servicer, server):
             ),
             'CreateUser': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateUser,
-                    request_deserializer=user__service__pb2.CreateUserRequest.FromString,
+                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                     response_serializer=user__service__pb2.UserResponse.SerializeToString,
             ),
             'ListUsers': grpc.unary_stream_rpc_method_handler(
@@ -143,7 +144,7 @@ class UserService(object):
             request,
             target,
             '/connect.UserService/CreateUser',
-            user__service__pb2.CreateUserRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             user__service__pb2.UserResponse.FromString,
             options,
             channel_credentials,

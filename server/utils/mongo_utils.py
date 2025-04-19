@@ -1,28 +1,18 @@
 import random
 import string
-from server.models import UserMetaDataModel
-from bson import ObjectId
-from mongoengine import ValidationError, NotUniqueError
 
 
-def get_uuid_from_uid(uid):
-    """
-    Fetches the UUID from MongoDB using the given UID.
-    
-    Args:
-        uid (str): The UID to search for.
-    
-    Returns:
-        str | None: The UUID if found, else None.
+async def get_uuid_from_uid(uid, usermeta_collection):
+    """Fetches the UUID from MongoDB using the given UID.
     """
     try:
-        user_doc = UserMetaDataModel.objects(uid=uid).first()
+        user_doc = await usermeta_collection.find_one({"uid": uid})
     except (Exception) as e:
         print("Error fetching user document:", e)
         return None
     
     if user_doc:
-        # When using MongoEngine, you access document fields as attributes, not via get()
+        # When using motor , you access document fields as dictionary keys
         return user_doc.uuid
     
     return None  # Return None if no match is found
@@ -37,24 +27,18 @@ def generate_custom_Uuid():
         return ''.join(characters)  # Convert back to a string
 
 
-def get_object_id_from_uid(uid):
+async def get_object_id_from_uid(uid,usermeta_collection):
     """
     Fetches the objectid from MongoDB using the given UID.
-    
-    Args:
-        uid (str): The UID to search for.
-    
-    Returns:
-        str | None: The objectid if found, else None.
     """
     try:
-        user_doc = UserMetaDataModel.objects(uid=uid).first()
+        user_doc = await usermeta_collection.find_one({"uid": uid})
     except (Exception) as e:
         print("Error fetching user document:", e)
         return None
     
     if user_doc:
-        # When using MongoEngine, you access document fields as attributes, not via get()
-        return user_doc.id
+        # When using motor , you access document fields as dictionary keys
+        return user_doc["_id"]
     
     return None  # Return None if no match is found

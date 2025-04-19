@@ -14,7 +14,7 @@ class UserMetaDataGRPCSerializer:
             "uuid": user.uuid,
             "username": user.username,
             "display_name": user.display_name,
-            "profile_image_url": user.profile_image_url,
+            "profile_image_url": str(user.profile_image_url),
             "phone_number": user.phone_number,
             "bio": user.bio,
             "is_online": user.is_online,

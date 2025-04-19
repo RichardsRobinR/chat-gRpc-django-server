@@ -1,89 +1,81 @@
-import mongoengine as me
+from pydantic import BaseModel, Field, HttpUrl ,ConfigDict
+from pydantic_core import core_schema
+from typing import Dict, Optional, Any, List 
+from bson import ObjectId
 
-class UserMetaDataModel(me.Document):
-    meta = {'collection': 'snap_usermeta'}
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_pydantic_core_schema__(cls, _source_type, _handler):
+        def validate_from_str(value: str) -> ObjectId:
+            if ObjectId.is_valid(value):
+                return cls(value)
+            raise ValueError(f"Invalid ObjectId: {value}")
 
+        return core_schema.union_schema(
+            [
+                # Check if it's an instance first
+                core_schema.is_instance_schema(ObjectId),
+                # Then check if it's a string and can be converted
+                core_schema.no_info_plain_validator_function(validate_from_str),
+            ],
+            serialization=core_schema.to_string_ser_schema(),
+        )
 
-    uid = me.StringField(max_length=128, unique=True, required=True)
-    uuid = me.StringField(max_length=6, unique=True, required=True)
-    username = me.StringField(max_length=50, unique=True, required=True)
-    display_name = me.StringField(max_length=100, required=True)
-    profile_image_url = me.URLField(required=False)
-    phone_number = me.StringField(max_length=20, required=True)
-    bio = me.StringField()
-
-    is_online = me.BooleanField(default=False)
-    has_story = me.BooleanField(default=False)
-    last_seen = me.LongField(default=0)
-    created_at = me.LongField(default=0,required=True)
-    last_login = me.LongField(default=0)
-
-    group_id = me.ListField(me.StringField())
-    past_uuids = me.ListField(me.StringField())
-    blocked_users_id = me.ListField(me.StringField())
-
-    is_verified = me.BooleanField(default=False)
-    is_active = me.BooleanField(default=True)
-    is_staff = me.BooleanField(default=False)
-
-    def __str__(self):
-        return self.username
-
-
-class MessageModel(me.Document):
-    meta = {'collection': 'snap_messages'}
-
-    # id = me.ObjectIdField(primary_key=True)
-    # chat_id = me.ReferenceField('ChatMetaDataModel', required=True)  # Reference to the chat
-    sender_ref = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the sender
-    recipient_ref = me.ReferenceField('UserMetaDataModel', required=True)  # Reference to the recipient
-    content = me.StringField(required=True)
-    chat_room_ref = me.ReferenceField('ChatMetaDataModel', required=True)  # Reference to the chat room
-    # timestamp = me.DateTimeField(required=True)
-    # message_type = me.StringField(max_length=20, required=True)  # e.g., 'text', 'image', 'video'
-    status = me.StringField(max_length=20, default='sent')  # e.g., 'sent', 'delivered', 'read'
-
-    def __str__(self):
-        return f"Message({str(self.id)})"
-
-
-class ChatMetaDataModel(me.Document):
-    meta = {'collection': 'snap_chat_rooms'}
-
-    # Core fields
-    id = me.ObjectIdField(primary_key=True)
-    # chat_id = me.StringField(max_length=128, unique=True, required=True)
-    # chat_type = me.StringField(max_length=20, required=True)  # e.g., 'individual', 'group'
+class UserMetaDataModel(BaseModel):
+    id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    uid: str = Field(...)
+    uuid: str = Field(...)
+    username: str = Field(...)
+    display_name: str = Field(...)
+    profile_image_url: Optional[HttpUrl] = None
+    phone_number: str
+    bio: Optional[str] = None
     
-    # participants_uid = me.ListField(me.ReferenceField(''))  # Array of User references
-    participants_uid  = me.DictField()  # Dictionary of User references
-    last_message = me.StringField(max_length=20,default=None,null=True)  # Reference to the most recent message
-    last_message_sender_ref = me.ReferenceField('UserMetaDataModel',default=None,null=True)  # ref of the last message sender
-    last_read_time = me.DictField()  # uid -> last read timestamp
-    unread_counts = me.MapField(field=me.IntField(),default=None,null=True)  # uid -> count
-    chat_request_status = me.StringField(max_length=20,default=None,null=True)  # e.g., 'pending', 'accepted', 'declined'
-
-    # typing_user_ids = me.ListField(me.StringField())  # UIDs of users typing
-
-    chat_source = me.StringField(max_length=20)  # e.g., 'phonenumber'
-    initiated_by_phone_number = me.BooleanField(default=False)  # True if the chat was initiated by a phone number
+    is_online: bool = False
+    has_story: bool = False
+    last_seen: int = 0
+    created_at: int
+    last_login: int = 0
     
-    # created_at = me.DateTimeField(required=True)
-    # updated_at = me.DateTimeField()
-    # last_message = me.ReferenceField('MessageModel')  # Reference to the most recent message
-
-    # Group metadata (only for group chats)
-    # group_metadata = me.EmbeddedDocumentField('GroupMetaData', null=True)
-
-    def __str__(self):
-        return f"ChatMetaDataModel({str(self.id)})"
-
-class GroupMetaData(me.EmbeddedDocument):
-    name = me.StringField(max_length=100)
-    description = me.StringField()
-    creation_date = me.DateTimeField()
-    created_by = me.ReferenceField('UserMetaDataModel')
-    admins = me.ListField(me.ReferenceField('UserMetaDataModel'))
-    profile_picture = me.StringField()  # URL or file reference
+    group_id: List[str] = []
+    past_uuids: List[str] = []
+    blocked_users_id: List[str] = []
+    
+    is_verified: bool = False
+    is_active: bool = True
+    is_staff: bool = False
+    
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
+    )
 
 
+
+class MessageModel(BaseModel):
+    id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    sender_ref: PyObjectId = Field(...)
+    recipient_ref: PyObjectId = Field(...)
+    content: str
+    chat_room_ref: PyObjectId = Field(...)
+    status: str = "sent"
+    
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
+    )
+
+class ChatMetaDataModel(BaseModel):
+    id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id") 
+    participants_uid: Dict[str, Any] = {}
+    last_message: Optional[str] = None
+    last_message_sender_ref: Optional[PyObjectId] = None
+    last_read_time: Dict[str, int] = {}
+    unread_counts: Dict[str, int] = {}
+    chat_request_status: Optional[str] = None
+    chat_source: str
+    initiated_by_phone_number: bool = False
+    
+    class Config:
+        validate_by_name = True
+        arbitrary_types_allowed = True

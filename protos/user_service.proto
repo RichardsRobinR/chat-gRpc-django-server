@@ -2,9 +2,12 @@ syntax = "proto3";
 
 package connect;
 
+import "google/protobuf/empty.proto";
+
+
 service UserService {
   rpc GetUser(UserRequest) returns (UserResponse);
-  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc CreateUser(google.protobuf.Empty) returns (UserResponse);
   rpc ListUsers(Empty) returns (stream UserResponse);
 }
 

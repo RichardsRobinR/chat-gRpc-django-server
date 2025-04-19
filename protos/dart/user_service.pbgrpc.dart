@@ -15,6 +15,7 @@ import 'dart:core' as $core;
 import 'package:grpc/service_api.dart' as $grpc;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'google/protobuf/empty.pb.dart' as $1;
 import 'user_service.pb.dart' as $0;
 
 export 'user_service.pb.dart';
@@ -25,9 +26,9 @@ class UserServiceClient extends $grpc.Client {
       '/connect.UserService/GetUser',
       ($0.UserRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.UserResponse.fromBuffer(value));
-  static final _$createUser = $grpc.ClientMethod<$0.CreateUserRequest, $0.UserResponse>(
+  static final _$createUser = $grpc.ClientMethod<$1.Empty, $0.UserResponse>(
       '/connect.UserService/CreateUser',
-      ($0.CreateUserRequest value) => value.writeToBuffer(),
+      ($1.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.UserResponse.fromBuffer(value));
   static final _$listUsers = $grpc.ClientMethod<$0.Empty, $0.UserResponse>(
       '/connect.UserService/ListUsers',
@@ -44,7 +45,7 @@ class UserServiceClient extends $grpc.Client {
     return $createUnaryCall(_$getUser, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.UserResponse> createUser($0.CreateUserRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$0.UserResponse> createUser($1.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$createUser, request, options: options);
   }
 
@@ -65,12 +66,12 @@ abstract class UserServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.UserRequest.fromBuffer(value),
         ($0.UserResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.CreateUserRequest, $0.UserResponse>(
+    $addMethod($grpc.ServiceMethod<$1.Empty, $0.UserResponse>(
         'CreateUser',
         createUser_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $0.CreateUserRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
         ($0.UserResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.Empty, $0.UserResponse>(
         'ListUsers',
@@ -85,7 +86,7 @@ abstract class UserServiceBase extends $grpc.Service {
     return getUser($call, await $request);
   }
 
-  $async.Future<$0.UserResponse> createUser_Pre($grpc.ServiceCall $call, $async.Future<$0.CreateUserRequest> $request) async {
+  $async.Future<$0.UserResponse> createUser_Pre($grpc.ServiceCall $call, $async.Future<$1.Empty> $request) async {
     return createUser($call, await $request);
   }
 
@@ -94,6 +95,6 @@ abstract class UserServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.UserResponse> getUser($grpc.ServiceCall call, $0.UserRequest request);
-  $async.Future<$0.UserResponse> createUser($grpc.ServiceCall call, $0.CreateUserRequest request);
+  $async.Future<$0.UserResponse> createUser($grpc.ServiceCall call, $1.Empty request);
   $async.Stream<$0.UserResponse> listUsers($grpc.ServiceCall call, $0.Empty request);
 }
