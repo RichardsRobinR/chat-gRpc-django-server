@@ -15,24 +15,24 @@ import 'dart:core' as $core;
 import 'package:grpc/service_api.dart' as $grpc;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'chat_service.pb.dart' as $2;
+import 'chat_service.pb.dart' as $1;
 
 export 'chat_service.pb.dart';
 
 @$pb.GrpcServiceName('connect.ChatService')
 class ChatServiceClient extends $grpc.Client {
-  static final _$messageStream = $grpc.ClientMethod<$2.Message, $2.Message>(
+  static final _$messageStream = $grpc.ClientMethod<$1.Message, $1.Message>(
       '/connect.ChatService/MessageStream',
-      ($2.Message value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.Message.fromBuffer(value));
-  static final _$chatRoom = $grpc.ClientMethod<$2.GetOrCreateChatRoomRequest, $2.ChatResponse>(
+      ($1.Message value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.Message.fromBuffer(value));
+  static final _$chatRoom = $grpc.ClientMethod<$1.GetOrCreateChatRoomRequest, $1.ChatResponse>(
       '/connect.ChatService/ChatRoom',
-      ($2.GetOrCreateChatRoomRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.ChatResponse.fromBuffer(value));
-  static final _$verifyUuid = $grpc.ClientMethod<$2.VerifyUuidRequest, $2.VerifyUuidResponse>(
+      ($1.GetOrCreateChatRoomRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.ChatResponse.fromBuffer(value));
+  static final _$verifyUuid = $grpc.ClientMethod<$1.VerifyUuidRequest, $1.VerifyUuidResponse>(
       '/connect.ChatService/VerifyUuid',
-      ($2.VerifyUuidRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.VerifyUuidResponse.fromBuffer(value));
+      ($1.VerifyUuidRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.VerifyUuidResponse.fromBuffer(value));
 
   ChatServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -40,15 +40,15 @@ class ChatServiceClient extends $grpc.Client {
       : super(channel, options: options,
         interceptors: interceptors);
 
-  $grpc.ResponseStream<$2.Message> messageStream($async.Stream<$2.Message> request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$1.Message> messageStream($async.Stream<$1.Message> request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$messageStream, request, options: options);
   }
 
-  $grpc.ResponseFuture<$2.ChatResponse> chatRoom($2.GetOrCreateChatRoomRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$1.ChatResponse> chatRoom($1.GetOrCreateChatRoomRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$chatRoom, request, options: options);
   }
 
-  $grpc.ResponseFuture<$2.VerifyUuidResponse> verifyUuid($2.VerifyUuidRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$1.VerifyUuidResponse> verifyUuid($1.VerifyUuidRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$verifyUuid, request, options: options);
   }
 }
@@ -58,38 +58,38 @@ abstract class ChatServiceBase extends $grpc.Service {
   $core.String get $name => 'connect.ChatService';
 
   ChatServiceBase() {
-    $addMethod($grpc.ServiceMethod<$2.Message, $2.Message>(
+    $addMethod($grpc.ServiceMethod<$1.Message, $1.Message>(
         'MessageStream',
         messageStream,
         true,
         true,
-        ($core.List<$core.int> value) => $2.Message.fromBuffer(value),
-        ($2.Message value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.GetOrCreateChatRoomRequest, $2.ChatResponse>(
+        ($core.List<$core.int> value) => $1.Message.fromBuffer(value),
+        ($1.Message value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.GetOrCreateChatRoomRequest, $1.ChatResponse>(
         'ChatRoom',
         chatRoom_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $2.GetOrCreateChatRoomRequest.fromBuffer(value),
-        ($2.ChatResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.VerifyUuidRequest, $2.VerifyUuidResponse>(
+        ($core.List<$core.int> value) => $1.GetOrCreateChatRoomRequest.fromBuffer(value),
+        ($1.ChatResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.VerifyUuidRequest, $1.VerifyUuidResponse>(
         'VerifyUuid',
         verifyUuid_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $2.VerifyUuidRequest.fromBuffer(value),
-        ($2.VerifyUuidResponse value) => value.writeToBuffer()));
+        ($core.List<$core.int> value) => $1.VerifyUuidRequest.fromBuffer(value),
+        ($1.VerifyUuidResponse value) => value.writeToBuffer()));
   }
 
-  $async.Future<$2.ChatResponse> chatRoom_Pre($grpc.ServiceCall $call, $async.Future<$2.GetOrCreateChatRoomRequest> $request) async {
+  $async.Future<$1.ChatResponse> chatRoom_Pre($grpc.ServiceCall $call, $async.Future<$1.GetOrCreateChatRoomRequest> $request) async {
     return chatRoom($call, await $request);
   }
 
-  $async.Future<$2.VerifyUuidResponse> verifyUuid_Pre($grpc.ServiceCall $call, $async.Future<$2.VerifyUuidRequest> $request) async {
+  $async.Future<$1.VerifyUuidResponse> verifyUuid_Pre($grpc.ServiceCall $call, $async.Future<$1.VerifyUuidRequest> $request) async {
     return verifyUuid($call, await $request);
   }
 
-  $async.Stream<$2.Message> messageStream($grpc.ServiceCall call, $async.Stream<$2.Message> request);
-  $async.Future<$2.ChatResponse> chatRoom($grpc.ServiceCall call, $2.GetOrCreateChatRoomRequest request);
-  $async.Future<$2.VerifyUuidResponse> verifyUuid($grpc.ServiceCall call, $2.VerifyUuidRequest request);
+  $async.Stream<$1.Message> messageStream($grpc.ServiceCall call, $async.Stream<$1.Message> request);
+  $async.Future<$1.ChatResponse> chatRoom($grpc.ServiceCall call, $1.GetOrCreateChatRoomRequest request);
+  $async.Future<$1.VerifyUuidResponse> verifyUuid($grpc.ServiceCall call, $1.VerifyUuidRequest request);
 }

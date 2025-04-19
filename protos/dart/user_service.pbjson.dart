@@ -77,18 +77,6 @@ const UserResponse$json = {
 final $typed_data.Uint8List userResponseDescriptor = $convert.base64Decode(
     'CgxVc2VyUmVzcG9uc2USIQoEdXNlchgBIAEoCzINLmNvbm5lY3QuVXNlclIEdXNlcg==');
 
-@$core.Deprecated('Use createUserRequestDescriptor instead')
-const CreateUserRequest$json = {
-  '1': 'CreateUserRequest',
-  '2': [
-    {'1': 'user', '3': 1, '4': 1, '5': 11, '6': '.connect.User', '10': 'user'},
-  ],
-};
-
-/// Descriptor for `CreateUserRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List createUserRequestDescriptor = $convert.base64Decode(
-    'ChFDcmVhdGVVc2VyUmVxdWVzdBIhCgR1c2VyGAEgASgLMg0uY29ubmVjdC5Vc2VyUgR1c2Vy');
-
 @$core.Deprecated('Use emptyDescriptor instead')
 const Empty$json = {
   '1': 'Empty',
