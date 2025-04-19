@@ -172,3 +172,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+#firbase config
+firebase-adminsdk-service-account.json

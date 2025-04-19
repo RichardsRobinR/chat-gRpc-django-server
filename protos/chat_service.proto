@@ -35,6 +35,7 @@ message Message {
 
 message ChatResponse {
   Chat chat = 1;
+  repeated connect.User user = 2;
 }
 
 message Chat {

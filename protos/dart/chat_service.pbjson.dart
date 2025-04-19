@@ -129,12 +129,14 @@ const ChatResponse$json = {
   '1': 'ChatResponse',
   '2': [
     {'1': 'chat', '3': 1, '4': 1, '5': 11, '6': '.connect.Chat', '10': 'chat'},
+    {'1': 'user', '3': 2, '4': 3, '5': 11, '6': '.connect.User', '10': 'user'},
   ],
 };
 
 /// Descriptor for `ChatResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List chatResponseDescriptor = $convert.base64Decode(
-    'CgxDaGF0UmVzcG9uc2USIQoEY2hhdBgBIAEoCzINLmNvbm5lY3QuQ2hhdFIEY2hhdA==');
+    'CgxDaGF0UmVzcG9uc2USIQoEY2hhdBgBIAEoCzINLmNvbm5lY3QuQ2hhdFIEY2hhdBIhCgR1c2'
+    'VyGAIgAygLMg0uY29ubmVjdC5Vc2VyUgR1c2Vy');
 
 @$core.Deprecated('Use chatDescriptor instead')
 const Chat$json = {

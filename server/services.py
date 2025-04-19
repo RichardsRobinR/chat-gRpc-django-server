@@ -398,6 +398,15 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 
            
             print("last message", chat_room.last_message)
+
+            # Sending user_meta of participents
+            cursor = usermeta_collection.find(
+                            {"_id": {"$ne": ObjectId(current_user_object_id)}},  # Exclude the specific document
+                            {"current_user_object_id": 0}  # Exclude the `current_user_object_id` field from results
+                    )
+            # Convert the cursor to a list (use await since it's async)
+            all_documents = await cursor.to_list(length=None)  # `length=None` fetches all documents
+            print("Cursor",all_documents)
             
             # Convert to protobuf message
             chat_proto = ChatMetaDataGRPCSerializer.to_proto(chat_room)

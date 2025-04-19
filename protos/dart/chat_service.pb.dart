@@ -305,10 +305,14 @@ class Message extends $pb.GeneratedMessage {
 class ChatResponse extends $pb.GeneratedMessage {
   factory ChatResponse({
     Chat? chat,
+    $core.Iterable<$0.User>? user,
   }) {
     final $result = create();
     if (chat != null) {
       $result.chat = chat;
+    }
+    if (user != null) {
+      $result.user.addAll(user);
     }
     return $result;
   }
@@ -318,6 +322,7 @@ class ChatResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ChatResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'connect'), createEmptyInstance: create)
     ..aOM<Chat>(1, _omitFieldNames ? '' : 'chat', subBuilder: Chat.create)
+    ..pc<$0.User>(2, _omitFieldNames ? '' : 'user', $pb.PbFieldType.PM, subBuilder: $0.User.create)
     ..hasRequiredFields = false
   ;
 
@@ -352,6 +357,9 @@ class ChatResponse extends $pb.GeneratedMessage {
   void clearChat() => $_clearField(1);
   @$pb.TagNumber(1)
   Chat ensureChat() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $pb.PbList<$0.User> get user => $_getList(1);
 }
 
 class Chat extends $pb.GeneratedMessage {
