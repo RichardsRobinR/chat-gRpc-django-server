@@ -1,4 +1,4 @@
-from .models import UserMetaDataModel, ChatMetaDataModel
+from .models import UserMetaDataModel, ChatMetaDataModel , MessageModel
 import hashlib
 from .serializers import UserMetaDataGRPCSerializer , ChatMetaDataGRPCSerializer
 import threading
@@ -7,11 +7,13 @@ import grpc
 from protos.python import user_service_pb2_grpc , user_service_pb2
 from protos.python import chat_service_pb2_grpc , chat_service_pb2
 from bson import ObjectId
-from .mongo_motor_connection import usermeta_collection , chat_room_collection
-from .utils.mongo_utils import get_object_id_from_uid
+from .mongo_motor_connection import usermeta_collection , chat_room_collection , messages_collection
+from .utils.mongo_utils import get_object_id_from_uid, generate_custom_Uuid
 import logging
 log = logging.getLogger(__name__)
 import time
+from .utils import firebase_utils
+import asyncio
 
 
 
@@ -21,7 +23,7 @@ class UserService(user_service_pb2_grpc.UserServiceServicer):
     async def GetUser(self, request, context):
         log.info("GetUser called")
 
-       
+        print("uid", request.uid)
         user = await usermeta_collection.find_one({"uid": request.uid})
         print("USER:", user)
 
@@ -45,6 +47,7 @@ class UserService(user_service_pb2_grpc.UserServiceServicer):
 
         auth_metadata = dict(context.invocation_metadata())
         token = auth_metadata.get('authorization')
+        firebase_user_metata = None
 
         if token:
             print(f"Authorization header received: {token}")
@@ -52,29 +55,33 @@ class UserService(user_service_pb2_grpc.UserServiceServicer):
             if token.startswith("Bearer "):
                 jwt_token = token[len("Bearer "):]
                 print("Extracted token:", jwt_token)
+
+                firebase_user_metata =  firebase_utils.verify_firebase_auth_token(token=jwt_token)
+                if firebase_user_metata.get("success") == False:
+                    log.error("Firebase token verification failed")
+                    await context.abort(grpc.StatusCode.UNAUTHENTICATED, firebase_user_metata.get("message"))
+                
+                print("Firebase token verified successfully")
         else:
             await context.abort(grpc.StatusCode.UNAUTHENTICATED, "Missing authorization token")
 
 
-        try:
-            uid = request.user.uid or None
-            uuid = request.user.uuid or None
-            username = request.user.username or None
-            phone_number = request.user.phone_number or None
-            profile_image_url = request.user.profile_image_url or None
-            
-            
-            # Generate the display name
-            display_name = "sc-" + username
-            print("DISPLAY NAME:", display_name)
+        if request.uid != firebase_user_metata.get("uid"):
+            log.error("UID mismatch")
+            await context.abort(grpc.StatusCode.UNAUTHENTICATED, 'UID mismatch')
 
+        try:
+            uid = firebase_user_metata.get("uid")
+            uuid = generate_custom_Uuid()
+            username = firebase_user_metata.get("username") or "@sc-" + str(uid[:6]).lower()
+            phone_number = firebase_user_metata.get("phone_number") or None
+            display_name = "sc-" + uid[:6]
             
             print("UID:", uid)
             print("UUID:", uuid)
             print("USERNAME:", username)
             print("PHONE NUMBER:", phone_number)
-            print("PROFILE IMAGE URL:", profile_image_url)
-
+            print("DISPLAY NAME:", display_name)
 
             if not uid or not uuid or not username or not phone_number:
                 log.error("All fields are present")
@@ -85,36 +92,30 @@ class UserService(user_service_pb2_grpc.UserServiceServicer):
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Invalid UUID length')
 
             # Check if user already exists
-            existing_user = await usermeta_collection.find_one({"uid": uid})
-            print("EXISTING USER:", existing_user)
-            if existing_user:
+            user = await usermeta_collection.find_one({"uid": uid})
+            if not user:
                 # context.set_code(grpc.StatusCode.ALREADY_EXISTS)
                 # context.set_details('User already exists')
-                log.error("User already exists")
-                await context.abort(grpc.StatusCode.ALREADY_EXISTS, 'User already exists')
+                    # Create new user
+                user = UserMetaDataModel(
+                    uid=uid,
+                    uuid=uuid,
+                    username=username,
+                    phone_number=phone_number,
+                    display_name=display_name,
+                    created_at = int(time.time() * 1000),
+                )
 
-
-            profile_image_url = request.User.profile_image_url if request.user.profile_image_url else None
-            log.info(f"Profile image URL: {profile_image_url}")
-
-            # Create new user
-            new_user = UserMetaDataModel(
-                uid=uid,
-                uuid=uuid,
-                username=username,
-                phone_number=phone_number,
-                display_name=display_name,
-                profile_image_url=profile_image_url,
-                created_at = int(time.time() * 1000),
-            )
-
-            new_user_dict = new_user.model_dump(by_alias=True)
-            result = await usermeta_collection.insert_one(new_user_dict)
-                
-            print("COLLECTION INSERTED RESULT:", result)
-            log.info(f"User created successfully: {result.inserted_id}")
-
-            user_proto = UserMetaDataGRPCSerializer.to_proto(new_user)
+                user_dict = user.model_dump(by_alias=True)
+                result = await usermeta_collection.insert_one(user_dict)
+                    
+                print("COLLECTION INSERTED RESULT:", result)
+                log.info(f"User created successfully: {result.inserted_id}")
+            elif user:
+                log.info("User already exists")
+                user = UserMetaDataModel(**user)
+            
+            user_proto = UserMetaDataGRPCSerializer.to_proto(user)
             log.info(f"CreatUser completed successfully:")
             return user_service_pb2.UserResponse(user=user_proto)
 
@@ -128,92 +129,110 @@ class UserService(user_service_pb2_grpc.UserServiceServicer):
 
 class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 
-#     def __init__(self):
-#         self.connected_users = {}  # Maps username to queue 
-#         self.lock = threading.Lock()
+    def __init__(self):
+        self.connected_users = {}  # Maps username to asyncio.Queue
+        self.lock = asyncio.Lock()
 
-#     def MessageStream(self, request_iterator, context):
-#         """Handle bidirectional chat stream with improved error handling"""
+    async def MessageStream(self, request_iterator, context):
+        """Handle bidirectional chat stream with improved error handling"""
         
-#         try:
+        try:
 
-#             # Get first message to identify sender and initialize queue
-#             first_message = next(request_iterator)
-#             log.info("MessageStream called")
-#             sender = first_message.sender_ref
-#             print("SENDER:", sender)
-#             print("FIRST MESSAGE:", first_message.sender_ref)
+            # Get first message to identify sender and initialize queue
+            first_message = await request_iterator.__anext__()
+            log.info("MessageStream called")
+            sender = first_message.sender_ref
+            print("SENDER:", sender)
+            print("FIRST MESSAGE:", first_message.sender_ref)
             
-#             with self.lock:
-#                 if sender not in self.connected_users:
-#                     my_queue = queue.Queue()
-#                     self.connected_users[sender] = my_queue
-#                     print(f"User {sender} connected. Total users: {len(self.connected_users)}")
-#                     # MessageModel.objects.get()
+            async with self.lock:
+                if sender not in self.connected_users:
+                    my_queue = asyncio.Queue()
+                    self.connected_users[sender] = my_queue
+                    print(f"User {sender} connected. Total users: {len(self.connected_users)}")
+                    # MessageModel.objects.get()
 #                     unsent_messages = MessageModel.objects(sender_ref=ObjectId(sender),chat_room_ref=ObjectId(first_message.chat_room_ref))
 #                     print("UNSENT MESSAGES:", unsent_messages)
 
-#                 else:
-#                     my_queue = self.connected_users[sender]  # Get existing queue
+                else:
+                    my_queue = self.connected_users[sender]  # Get existing queue
 
-#             # Start message processing thread
-#             def process_messages():
-#                 try:
+                # Process messages in the background
+                processing_task = asyncio.create_task(
+                    self._process_messages(first_message, request_iterator, my_queue)
+                )
 
-#                     print("first_message", first_message)
-#                     # Process first message
-#                     self._route_message(first_message, my_queue)
-#                     # Process remaining messages
-#                     for message in request_iterator:
-#                         self._route_message(message, my_queue)
-#                 except Exception as e:
-#                     print(f"Error processing messages: {e}")
 
-#             if threading.main_thread().is_alive():
-#                 message_thread = threading.Thread(target=process_messages, daemon=True)
-#                 message_thread.start()
+                # Set up cleanup for when client disconnects
+                context.add_done_callback(
+                    lambda _: asyncio.create_task(self._cleanup(sender, processing_task))
+                )
 
-#             # Yield messages from queue
-#             while True:
-#                 try:
-#                     message = my_queue.get()
-#                     yield message
-#                 except Exception as e:
-#                     print(f"Error in message stream: {e}")
-#                     break
 
-#         except StopIteration:
-#             return
-#         except Exception as e:
-#             print(f"Chat stream error: {e}")
-#             context.abort(grpc.StatusCode.INTERNAL, str(e))
+            # Yield messages from queue
+            while True:
+                try:
+                    message =  await my_queue.get()
+                    yield message
+                except asyncio.CancelledError:
+                    break
+                except Exception as e:
+                    print(f"Error in message stream: {e}")
+                    break
 
-#     def _route_message(self, message, sender_queue):
-#         """Route message to recipient or send error if offline"""
-#         if message.content == "__join__":
-#             return  # Don't forward join messages
+        except StopAsyncIteration:
+            return
+        except Exception as e:
+            print(f"Chat stream error: {e}")
+            await context.abort(grpc.StatusCode.INTERNAL, str(e))
+
+    async def _cleanup(self, sender, task):
+        """Clean up when a client disconnects"""
+        task.cancel()
+        async with self.lock:
+            if sender in self.connected_users:
+                del self.connected_users[sender]
+                print(f"User {sender} disconnected. Total users: {len(self.connected_users)}")
+
+    async def _process_messages(self, first_message, request_iterator, my_queue):
+        """Process incoming messages from a client"""
+        try:
+            # Process first message
+            await self._route_message(first_message, my_queue)
+            # Process remaining messages
+            async for message in request_iterator:
+                await self._route_message(message, my_queue)
+        except asyncio.CancelledError:
+            # Expected when client disconnects
+            pass
+        except Exception as e:
+            print(f"Error processing messages: {e}")
+    
+
+    async def _route_message(self, message, sender_queue):
+        """Route message to recipient or send error if offline"""
+        if message.content == "__join__":
+            return  # Don't forward join messages
         
-#         if message.content == "__leave__":
-#             del self.connected_users[message.sender_ref]
-#             print(f"User {message.sender} disconnected. Total users: {len(self.connected_users)}")
-#             return  # Don't forward leave messages
+        if message.content == "__leave__":
+            return  # Handled by _cleanup
 
-#         with self.lock:
-#             recipient_ref = message.recipient_ref
+        async with self.lock:
+            recipient_ref = message.recipient_ref
 
-#             # acknowledge message to the sender
-#             # if message.sender_ref in self.connected_users:
+            # acknowledge message to the sender
+            # if message.sender_ref in self.connected_users:
 #             #     aacknowledge_message = chat_service_pb2.Message(
 #             #         sender="SERVER",
 #             #         content="SENT",
 #             #         recipient=message.sender_ref,
 #             #     )
-#             #     sender_queue.put(aacknowledge_message)
+#             #  await    sender_queue.put(aacknowledge_message)
 
 
            
-#             if recipient_ref in self.connected_users:
-#                 self.connected_users[recipient_ref].put(message)
+            if recipient_ref in self.connected_users:
+                self.connected_users[recipient_ref].put(message)
                 
 #                 # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
 #                 # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
@@ -222,18 +241,18 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 #                 # chat_source_value = request.chat_source
 #                 # chat_source_enum_name = chat_service_pb2.MessageStatus.
 
-#                 msg = self._db_send_message(message, recipient_ref, status="DELIVERED")
+                msg = await self._db_send_message(message, recipient_ref, status="DELIVERED")
 
 #                 # acknowledge message to the sender
                 
                 
-#             else:
+            else:
 #                 # sender = UserMetaDataModel.objects.get(id=ObjectId(message.sender))
 #                 # recipient = UserMetaDataModel.objects.get(id=ObjectId(recipient))
 #                 # print("SENDER:", sender)
 #                 # print("RECIPIENT:", recipient)
 
-#                 self._db_send_message(message, recipient_ref, status="SENT")
+                await self._db_send_message(message, recipient_ref, status="SENT")
 
 #                 # error_msg = chat_service_pb2.Message(
 #                 #     message_id="0",
@@ -244,18 +263,34 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 #                 # sender_queue.put(error_msg)
 
 
-#     def _db_send_message(self,message, recipient, status):
-#         """Save message to database"""
+    async def _db_send_message(self,message, recipient, status):
+        """Save message to database asynchronously using Motor"""
 
-#         try:
+        try:
 
 #             # chat_room_ref = ChatMetaDataModel.objects(id=ObjectId(message.chat_room_ref)).first()
-#             msg =  MessageModel(sender_ref = ObjectId(message.sender_ref), recipient_ref = ObjectId(recipient), 
-#                 content=message.content,
-#                 status=status,
-#                 chat_room_ref = ObjectId(message.chat_room_ref),
-#             ).save()
-#             print("Message saved:", msg)
+            msg =  MessageModel(sender_ref = ObjectId(message.sender_ref), recipient_ref = ObjectId(recipient), 
+                content=message.content,
+                status=status,
+                chat_room_ref = ObjectId(message.chat_room_ref),
+
+            )
+            # Convert to dictionary before inserting
+            msg_dict = msg.model_dump(by_alias=True)
+            result = await messages_collection.insert_one(msg_dict)
+            print("Message saved with ID:", result)
+
+            # Update chat room
+            update_result = await chat_room_collection.update_one(
+                {'_id': ObjectId(message.chat_room_ref)},
+                {'$set': {
+                    'last_message': message.content,
+                    'last_message_sender_ref': ObjectId(message.sender_ref),
+                    f'last_read_time.{message.sender_ref}': int(time.time() * 1000)
+                }}
+            )
+
+             
 
 
             
@@ -276,10 +311,10 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
 
 #             # chat.save()
             
-#             print("Chat room updated:", chat)
-#             return msg
-#         except (ValidationError, NotUniqueError) as e:
-#             print("Failed to save message:", e)
+            print(f"Chat room updated, matched: {update_result.matched_count}")
+            return result.inserted_id
+        except Exception as e:
+            print("Failed to save message:", e)
 
     
     async def ChatRoom(self, request, context):
@@ -376,33 +411,34 @@ class ChatService(chat_service_pb2_grpc.ChatServiceServicer):
             raise
         
     
-#     def VerifyUuid(self, request, context):
-#         log.info("VerifyUuid called")
-#         try:
-#             uuid = request.uuid
-#             print("UUID:", uuid)
-#             if len(uuid) != 6:
-#                 # context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-#                 # context.set_details('Invalid UUID length')
-#                 log.error("Invalid UUID length")
-#                 context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Invalid UUID length')
+    async def VerifyUuid(self, request, context):
+        log.info("VerifyUuid called")
+        try:
+            uuid = request.uuid
+            print("UUID:", uuid)
+            if len(uuid) != 6:
+                # context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                # context.set_details('Invalid UUID length')
+                log.error("Invalid UUID length")
+                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Invalid UUID length')
 
-#             user = UserMetaDataModel.objects(uuid=uuid).first()
-#             print("USER:", user)
+            user = await usermeta_collection.find_one({"uuid": request.uuid})
+            print("USER:", user)
             
-#             if user == None:
-#                 log.info("User not found")
-#                 context.abort(grpc.StatusCode.NOT_FOUND, 'User not found')
+            if user == None:
+                log.info("User not found")
+                await context.abort(grpc.StatusCode.NOT_FOUND, 'User not found')
 
-#             user_proto = UserMetaDataGRPCSerializer.to_proto(user)
+            user = UserMetaDataModel(**user)
+            user_proto = UserMetaDataGRPCSerializer.to_proto(user)
 
-#             log.info("VerifyUuid finished")
-#             return chat_service_pb2.VerifyUuidResponse(user=user_proto)
-#         except grpc.RpcError as e:  
-#             print(f"Error in VerifyUuid: {e}")
-#             log.error(f"gRPC Error in VerifyUuid: {e.code()}: {e.details()}")
-#             raise
-#             # return chat_service_pb2.VerifyUuidResponse(user=None)
+            log.info("VerifyUuid finished")
+            return chat_service_pb2.VerifyUuidResponse(user=user_proto)
+        except grpc.RpcError as e:  
+            print(f"Error in VerifyUuid: {e}")
+            log.error(f"gRPC Error in VerifyUuid: {e.code()}: {e.details()}")
+            raise
+            # return chat_service_pb2.VerifyUuidResponse(user=None)
        
 
             

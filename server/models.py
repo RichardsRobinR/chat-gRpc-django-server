@@ -76,6 +76,7 @@ class ChatMetaDataModel(BaseModel):
     chat_source: str
     initiated_by_phone_number: bool = False
     
-    class Config:
-        validate_by_name = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
+    )
